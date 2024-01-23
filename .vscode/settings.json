@@ -1,0 +1,6 @@
+{
+    "editor.fontWeight": "normal",
+    "terminal.integrated.fontWeight": "normal",
+    "files.autoSave": "afterDelay",
+    "editor.fontSize": 12
+}
