@@ -18,6 +18,10 @@ export class BaseRepository<T> {
     return await this.repository.findById(id);
   }
 
+  async create(payload: any): Promise<T> {
+    return await this.repository.create(payload);
+  }
+
   async aggregate(query: any): Promise<T[]> {
     return await this.repository.aggregate(query);
   }
