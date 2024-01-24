@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags, ApiUnprocessableEn
 import { Response } from 'express';
 
 import { ErrorResponse, JsonResponse } from '@on/handlers/response';
+import { requestFilter } from '@on/helpers/request-filter';
 import { ApiResponseDTO } from '@on/utils/dto/response.dto';
 import { ResponseDTO } from '@on/utils/types';
 
@@ -28,7 +29,9 @@ export class UserController {
   @Get()
   async findUsers(@Res() res: Response, @Query() query: QueryUserDto): Promise<ResponseDTO> {
     try {
-      const response = await this.userService.find(query);
+      const filter = requestFilter(query);
+
+      const response = await this.userService.find(filter);
 
       return JsonResponse(res, response);
     } catch (error) {

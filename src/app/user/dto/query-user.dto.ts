@@ -4,24 +4,21 @@ import { ROLE } from '@on/enums';
 import { QueryDto } from '@on/utils/dto/query.dto';
 
 export class QueryUserDto extends QueryDto {
-  @ApiPropertyOptional({ example: 'plenty003' })
+  @ApiPropertyOptional({ description: 'username' })
   userName?: string;
 
-  @ApiPropertyOptional({ example: 'jane' })
+  @ApiPropertyOptional({ description: 'first name' })
   firstName?: string;
 
-  @ApiPropertyOptional({ example: 'doe' })
+  @ApiPropertyOptional({ description: 'last name' })
   lastName?: string;
 
-  @ApiPropertyOptional({ example: 'mee' })
+  @ApiPropertyOptional({ description: 'middle name' })
   middleName?: string;
 
-  @ApiPropertyOptional({ example: 'doe' })
-  search?: string;
-
-  @ApiPropertyOptional({ example: 'admin@gmail.com' })
+  @ApiPropertyOptional({ description: 'email' })
   email?: string;
 
-  @ApiPropertyOptional({ example: 'user' })
+  @ApiPropertyOptional({ description: 'role' })
   role?: ROLE;
 }
