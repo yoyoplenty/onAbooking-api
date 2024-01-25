@@ -1,0 +1,12 @@
+import { ObjectId } from 'mongodb';
+
+import { Property } from '@on/app/property/model/property.model';
+import { User } from '@on/app/user/model/user.model';
+import { IBaseType } from '@on/utils/types';
+
+export interface IBooking extends IBaseType {
+  propertyId: ObjectId | Property;
+  userId?: ObjectId | User;
+  checkIn: Date;
+  checkOut: Date;
+}

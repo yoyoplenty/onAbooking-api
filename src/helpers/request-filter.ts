@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 
 const ids = ['_id', 'propertyId'];
 
-export function requestFilter(data: Record<any, any>) {
+export function requestFilter(data) {
   if (data) {
     Object.keys(data).forEach((i) => {
       if (ids.includes(i) && typeof data[i] === 'string') {

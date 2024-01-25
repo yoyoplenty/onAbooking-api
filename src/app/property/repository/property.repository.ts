@@ -1,7 +1,7 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { BaseRepository } from '@on/repositories/base.reopsitory';
+import { BaseRepository } from '@on/repositories/base.repository';
 
 import { Property, PropertyDocument } from '../model/property.model';
 

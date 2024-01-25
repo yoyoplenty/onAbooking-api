@@ -2,12 +2,14 @@ import { Controller, Get, Query, Res, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags, ApiUnprocessableEntityResponse } from '@nestjs/swagger';
 import { Response } from 'express';
 
+import { Roles } from '@on/decorators/roles.decorator';
 import { ErrorResponse, JsonResponse } from '@on/handlers/response';
 import { requestFilter } from '@on/helpers/request-filter';
 import { ApiResponseDTO } from '@on/utils/dto/response.dto';
 import { ResponseDTO } from '@on/utils/types';
 
 import { JwtAuthGuard } from '../auth/guard/auth.guard';
+import { RoleGuard } from '../auth/guard/role.guard';
 
 import { QueryUserDto } from './dto/query.dto';
 import { User } from './model/user.model';
@@ -25,7 +27,8 @@ export class UserController {
     description: 'Allows admin get users',
   })
   @ApiOkResponse({ description: 'Get users successful ', type: [User] })
-  @UseGuards(JwtAuthGuard)
+  @Roles('admin')
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @Get()
   async findUsers(@Res() res: Response, @Query() query: QueryUserDto): Promise<ResponseDTO> {
     try {

@@ -8,8 +8,12 @@ type GenericRecord = Record<string, any> | any;
 export class BaseRepository<T> {
   constructor(private readonly repository: Model<T>) {}
 
-  async find(query?: GenericRecord, populateOptions?: PopulateOptions[]): Promise<T[]> {
-    return await this.queryBuilder(query, populateOptions).exec();
+  async find(
+    query?: GenericRecord,
+    populateOptions?: PopulateOptions[],
+    sortOptions?: { field: string; direction: number },
+  ): Promise<T[]> {
+    return await this.queryBuilder(query, populateOptions, sortOptions).exec();
   }
 
   async findOne(query: GenericRecord, populateOptions?: PopulateOptions[]): Promise<T> {
@@ -33,10 +37,16 @@ export class BaseRepository<T> {
     options: AggregateOption,
     populateOptions?: PopulateOptions[],
   ): Promise<{ data: T[]; count: number }> {
-    const queryBuilder = this.queryBuilder(query, populateOptions);
+    const dataQueryBuilder = this.queryBuilder(query, populateOptions);
+    const countQueryBuilder = this.repository.find(query);
 
-    const data = await queryBuilder.skip(options.skip).limit(options.limit).exec();
-    const count = await queryBuilder.countDocuments().exec();
+    const [data, count] = await Promise.all([
+      dataQueryBuilder
+        .skip(options.skip || 0)
+        .limit(options.limit || 0)
+        .exec(),
+      countQueryBuilder.countDocuments().exec(),
+    ]);
 
     return { data, count };
   }
@@ -44,9 +54,9 @@ export class BaseRepository<T> {
   async aggregate(query: any, options?: AggregateOption): Promise<T[]> {
     const aggregationPipeline: any[] = query;
 
-    if (options && options.limit !== undefined) aggregationPipeline.push({ $limit: options.limit });
+    if (options && options.limit !== undefined) aggregationPipeline.push({ $limit: Number(options.limit) });
 
-    if (options && options.skip !== undefined) aggregationPipeline.push({ $skip: options.skip });
+    if (options && options.skip !== undefined) aggregationPipeline.push({ $skip: Number(options.skip) });
 
     return await this.repository.aggregate(aggregationPipeline).exec();
   }
@@ -103,12 +113,19 @@ export class BaseRepository<T> {
     await this.repository.deleteMany(query);
   }
 
-  private queryBuilder(query: GenericRecord = {}, populateOptions?: PopulateOptions[]): any {
+  private queryBuilder(
+    query: GenericRecord = {},
+    populateOptions?: PopulateOptions[],
+    sortOptions?: { field: string; direction: number },
+  ): any {
     let queryBuilder: any = this.repository.find(query);
 
     if (populateOptions) queryBuilder = queryBuilder.populate(populateOptions);
 
-    queryBuilder = queryBuilder.sort({ createdAt: -1 });
+    const defaultSortOptions = { field: 'createdAt', direction: -1 };
+    const finalSortOptions = sortOptions || defaultSortOptions;
+
+    queryBuilder = queryBuilder.sort({ [finalSortOptions.field]: finalSortOptions.direction });
 
     return queryBuilder;
   }
