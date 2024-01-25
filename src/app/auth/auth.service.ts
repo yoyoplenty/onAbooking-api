@@ -40,7 +40,7 @@ export class AuthService {
 
     user.password = undefined;
 
-    const token = this.jwtService.sign(user);
+    const token = this.jwtService.sign(user.toObject());
 
     return { data: { user, token }, message: 'Login Successful' };
   }

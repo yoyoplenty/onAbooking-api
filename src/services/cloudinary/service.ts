@@ -18,25 +18,46 @@ export class CloudinaryService {
     });
   }
 
-  async uploadImage(image: MemoryStoredFile): Promise<UploadApiResponse> {
-    const result = (await cloudinary.uploader.upload(image.buffer.toString('base64'), {
-      resource_type: 'auto',
-    })) as UploadApiResponse;
+  private async uploadImageToCloudinary(image: MemoryStoredFile): Promise<UploadApiResponse> {
+    return new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream({ resource_type: 'auto' }, (error, result) => {
+        if (error) {
+          console.error(error);
+          reject(error);
+        } else {
+          console.log(result);
+          resolve(result);
+        }
+      });
 
-    return result;
+      stream.end(image.buffer);
+    });
   }
 
-  async uploadImages(images: MemoryStoredFile[]): Promise<UploadApiResponse[]> {
-    const uploadedImages = [];
+  async uploadImage(image: MemoryStoredFile): Promise<string> {
+    try {
+      const result = await this.uploadImageToCloudinary(image);
 
-    for (const image of images) {
-      const result = (await cloudinary.uploader.upload(image.buffer.toString('base64'), {
-        resource_type: 'auto',
-      })) as UploadApiResponse;
-
-      uploadedImages.push(result.secure_url);
+      return result.secure_url;
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
+  }
 
-    return uploadedImages;
+  async uploadImages(images: MemoryStoredFile[] | any): Promise<UploadApiResponse[]> {
+    try {
+      const uploadedImages = [];
+
+      for (const image of images) {
+        const result = await this.uploadImageToCloudinary(image);
+        uploadedImages.push(result.secure_url);
+      }
+
+      return uploadedImages;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
   }
 }
