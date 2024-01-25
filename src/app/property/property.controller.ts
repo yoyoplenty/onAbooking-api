@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Query, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Res, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiConsumes,
@@ -21,6 +21,7 @@ import { RoleGuard } from '../auth/guard/role.guard';
 
 import { CreatePropertyDto } from './dto/create.dto';
 import { QueryPropertyDto } from './dto/query.dto';
+import { UpdatePropertyDto } from './dto/update.dto';
 import { Property } from './model/property.model';
 import { PropertyService } from './property.service';
 
@@ -34,8 +35,8 @@ export class PropertyController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Admin uploads property',
-    description: 'Allows admin uploads property',
+    summary: 'Admin creates property',
+    description: 'Allows admin create property',
   })
   @ApiOkResponse({ description: 'Property creation successful ', type: ApiResponseDTO })
   @ApiConsumes('multipart/form-data')
@@ -61,9 +62,51 @@ export class PropertyController {
   @Get()
   async findProperties(@Res() res: Response, @Query() query: QueryPropertyDto): Promise<ResponseDTO> {
     try {
+      const { offset, limit } = query;
+
       const filter = requestFilter(query);
 
-      const response = await this.propertyService.find(filter);
+      const response = await this.propertyService.find(filter, offset, limit);
+
+      return JsonResponse(res, response);
+    } catch (error) {
+      return ErrorResponse(res, error);
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Admin updated property',
+    description: 'Allows admin updates property',
+  })
+  @ApiOkResponse({ description: 'Property updated successfully', type: ApiResponseDTO })
+  @ApiConsumes('multipart/form-data')
+  @FormDataRequest()
+  @Patch('/:id')
+  async updateProperty(
+    @Body() updatePropertyPayload: UpdatePropertyDto,
+    @Param('id') id: string,
+    @Res() res: Response,
+  ): Promise<ResponseDTO> {
+    try {
+      const response = await this.propertyService.update(id, updatePropertyPayload);
+
+      return JsonResponse(res, response);
+    } catch (error) {
+      return ErrorResponse(res, error);
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Admin delete property',
+    description: 'Allows admin deletes property',
+  })
+  @ApiOkResponse({ description: 'Property deletion successful ', type: ApiResponseDTO })
+  @Delete('/:id')
+  async deleteProperty(@Param('id') id: string, @Res() res: Response): Promise<ResponseDTO> {
+    try {
+      const response = await this.propertyService.delete(id);
 
       return JsonResponse(res, response);
     } catch (error) {

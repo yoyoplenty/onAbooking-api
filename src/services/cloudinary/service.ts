@@ -44,7 +44,7 @@ export class CloudinaryService {
     }
   }
 
-  async uploadImages(images: MemoryStoredFile[] | any): Promise<UploadApiResponse[]> {
+  async uploadImages(images: MemoryStoredFile[]): Promise<UploadApiResponse[]> {
     try {
       const uploadedImages = [];
 

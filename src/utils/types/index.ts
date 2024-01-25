@@ -16,3 +16,8 @@ export interface IBaseType {
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+export interface AggregateOption {
+  limit?: number;
+  skip?: number;
+}
