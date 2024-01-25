@@ -1,7 +1,7 @@
 import { ROLE } from '@on/enums';
-import { IBaseModel } from '@on/utils/types';
+import { IBaseType } from '@on/utils/types';
 
-export interface IUser extends IBaseModel {
+export interface IUser extends IBaseType {
   firstName: string;
   lastName: string;
   middleName: string;

@@ -9,29 +9,29 @@ import { ResponseDTO } from '@on/utils/types';
 
 import { JwtAuthGuard } from '../auth/guard/auth.guard';
 
-import { QueryUserDto } from './dto/query.dto';
-import { User } from './model/user.model';
-import { UserService } from './user.service';
+import { QueryPropertyDto } from './dto/query.dto';
+import { Property } from './model/property.model';
+import { PropertyService } from './property.service';
 
-@ApiTags('User')
+@ApiTags('Property')
 @ApiUnprocessableEntityResponse({ status: 422, description: 'Error occurred', type: ApiResponseDTO })
-@Controller('api/v1/users')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+@Controller('api/v1/properties')
+export class PropertyController {
+  constructor(private readonly propertyService: PropertyService) {}
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Get users',
-    description: 'Allows admin get users',
+    summary: 'Get properties',
+    description: 'Allows admin get properties',
   })
-  @ApiOkResponse({ description: 'Get users successful ', type: [User] })
+  @ApiOkResponse({ description: 'Get properties successful ', type: [Property] })
   @UseGuards(JwtAuthGuard)
   @Get()
-  async findUsers(@Res() res: Response, @Query() query: QueryUserDto): Promise<ResponseDTO> {
+  async findProperties(@Res() res: Response, @Query() query: QueryPropertyDto): Promise<ResponseDTO> {
     try {
       const filter = requestFilter(query);
 
-      const response = await this.userService.find(filter);
+      const response = await this.propertyService.find(filter);
 
       return JsonResponse(res, response);
     } catch (error) {

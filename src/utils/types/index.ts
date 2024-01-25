@@ -11,7 +11,7 @@ export interface ResponseDTO {
   message: string;
 }
 
-export interface IBaseModel {
+export interface IBaseType {
   _id?: ObjectId;
   createdAt?: Date;
   updatedAt?: Date;

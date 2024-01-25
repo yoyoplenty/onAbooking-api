@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { ServiceResponse } from '@on/utils/types';
 
 import { regexSearchQuery } from './../../helpers/search-query';
-import { QueryUserDto } from './dto/query-user.dto';
+import { QueryUserDto } from './dto/query.dto';
 import { UserRepository } from './repository/user.repository';
 
 @Injectable()

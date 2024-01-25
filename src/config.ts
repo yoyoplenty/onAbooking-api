@@ -23,5 +23,9 @@ export const config = {
     secretKey: process.env.AWS_SECRET_ACCESS_KEY,
     bucketName: process.env.AWS_BUCKET_NAME,
   },
-  cloudinary: {},
+  cloudinary: {
+    appKey: process.env.CLOUDINARY_ACCOUNT_KEY,
+    cloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    apiSecret: process.env.CLOUDINARY_SECRET_KEY,
+  },
 };

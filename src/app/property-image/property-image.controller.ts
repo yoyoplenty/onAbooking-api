@@ -9,29 +9,29 @@ import { ResponseDTO } from '@on/utils/types';
 
 import { JwtAuthGuard } from '../auth/guard/auth.guard';
 
-import { QueryUserDto } from './dto/query.dto';
-import { User } from './model/user.model';
-import { UserService } from './user.service';
+import { QueryPropertyImageDto } from './dto/query.dto';
+import { PropertyImage } from './model/property-images.model';
+import { PropertyImageService } from './property-image.service';
 
-@ApiTags('User')
+@ApiTags('PropertyImage')
 @ApiUnprocessableEntityResponse({ status: 422, description: 'Error occurred', type: ApiResponseDTO })
-@Controller('api/v1/users')
-export class UserController {
-  constructor(private readonly userService: UserService) {}
+@Controller('api/v1/property_images')
+export class PropertyImageController {
+  constructor(private readonly propertyImageService: PropertyImageService) {}
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Get users',
-    description: 'Allows admin get users',
+    summary: 'Get property images',
+    description: 'Allows admin get property images',
   })
-  @ApiOkResponse({ description: 'Get users successful ', type: [User] })
+  @ApiOkResponse({ description: 'Get property images successful ', type: [PropertyImage] })
   @UseGuards(JwtAuthGuard)
   @Get()
-  async findUsers(@Res() res: Response, @Query() query: QueryUserDto): Promise<ResponseDTO> {
+  async findPropertyImages(@Res() res: Response, @Query() query: QueryPropertyImageDto): Promise<ResponseDTO> {
     try {
       const filter = requestFilter(query);
 
-      const response = await this.userService.find(filter);
+      const response = await this.propertyImageService.find(filter);
 
       return JsonResponse(res, response);
     } catch (error) {
