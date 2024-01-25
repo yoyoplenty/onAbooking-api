@@ -42,8 +42,6 @@ export class PropertyService {
   }
 
   async find(filter: QueryPropertyDto, skip?, limit?): Promise<ServiceResponse> {
-    console.log(filter);
-
     const data = await this.property.aggregateAndCount(
       [
         { $match: filter },
