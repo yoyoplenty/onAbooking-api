@@ -1,7 +1,7 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { BaseRepository } from '@on/repositories/base';
+import { BaseRepository } from '@on/repositories/base.reopsitory';
 
 import { PropertyImage, PropertyImageDocument } from '../model/property-images.model';
 
