@@ -1,10 +1,10 @@
-import { ApiHideProperty, ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
 
 import { PROPERTY_TYPE } from '@on/enums';
 import { PropertyUploadDto } from '@on/utils/dto/property-upload.dto';
 
-export class CreatePropertyDto extends PartialType(PropertyUploadDto) {
+export class CreatePropertyDto extends PropertyUploadDto {
   @ApiProperty({ description: 'Property name', required: true })
   @IsNotEmpty()
   @IsString()

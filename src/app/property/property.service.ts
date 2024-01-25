@@ -68,16 +68,18 @@ export class PropertyService {
     const propertyExist = await this.property.findById(new ObjectId(id));
     if (!propertyExist) throw new NotFoundException('property not found');
 
-    const imageUrls = await this.cloudinary.uploadImages(images);
-
     const property = await this.property.updateById(new ObjectId(id), updatePropertyPayload);
 
-    const propertyImageDocuments = imageUrls.map((imageUrl) => ({
-      propertyId: property._id,
-      imageUrl,
-    }));
+    if (files) {
+      const imageUrls = await this.cloudinary.uploadImages(images);
 
-    await this.propertyImage.createMany(propertyImageDocuments);
+      const propertyImageDocuments = imageUrls.map((imageUrl) => ({
+        propertyId: property._id,
+        imageUrl,
+      }));
+
+      await this.propertyImage.createMany(propertyImageDocuments);
+    }
 
     return { data: property, message: `Properties successfully updated` };
   }
