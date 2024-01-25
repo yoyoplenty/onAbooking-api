@@ -50,6 +50,19 @@ export class BookingService {
   }
 
   async update(id: ObjectId | string, updateBookingPayload: UpdateBookingDto): Promise<ServiceResponse> {
+    const { checkIn = null, checkOut = null } = updateBookingPayload;
+
+    const booking = await this.booking.findById(new ObjectId(id));
+    const propertyId = String(booking.propertyId) || updateBookingPayload.propertyId;
+
+    if (checkIn || checkOut) {
+      const property = await this.property.findById(new ObjectId(propertyId));
+      if (!property) throw new NotFoundException('property not found');
+
+      const propertyAvailable = await this.isPropertyAvailable(new ObjectId(propertyId), checkIn, checkOut);
+      if (!propertyAvailable) throw new ConflictException('Property not available');
+    }
+
     const data = await this.booking.updateById(new ObjectId(id), updateBookingPayload);
 
     return { data, message: `Bookings successfully updated` };

@@ -26,9 +26,9 @@ export class BookingController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'User makes a booking',
-    description: 'Allows admin create booking',
+    description: 'Allows users make a property booking',
   })
-  @ApiOkResponse({ description: 'Booking creation successful ', type: ApiResponseDTO })
+  @ApiOkResponse({ description: 'Booking successful ', type: ApiResponseDTO })
   @UseGuards(JwtAuthGuard)
   @Post()
   async Book(
