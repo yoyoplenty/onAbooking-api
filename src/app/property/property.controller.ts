@@ -27,8 +27,6 @@ import { PropertyService } from './property.service';
 
 @ApiTags('Property')
 @ApiUnprocessableEntityResponse({ status: 422, description: 'Error occurred', type: ApiResponseDTO })
-@Roles('admin')
-@UseGuards(JwtAuthGuard, RoleGuard)
 @Controller('api/v1/properties')
 export class PropertyController {
   constructor(private readonly propertyService: PropertyService) {}
@@ -39,6 +37,8 @@ export class PropertyController {
     description: 'Allows admin create property',
   })
   @ApiOkResponse({ description: 'Property creation successful ', type: ApiResponseDTO })
+  @Roles('admin')
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @ApiConsumes('multipart/form-data')
   @FormDataRequest()
   @Post()
@@ -52,13 +52,11 @@ export class PropertyController {
     }
   }
 
-  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Get properties',
-    description: 'Allows admin get properties',
+    description: 'Allows users get properties',
   })
   @ApiOkResponse({ description: 'Get properties successful ', type: [Property] })
-  @UseGuards(JwtAuthGuard)
   @Get()
   async findProperties(@Res() res: Response, @Query() query: QueryPropertyDto): Promise<ResponseDTO> {
     try {
@@ -76,10 +74,12 @@ export class PropertyController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Admin updated property',
+    summary: 'Admin updates property',
     description: 'Allows admin updates property',
   })
   @ApiOkResponse({ description: 'Property updated successfully', type: ApiResponseDTO })
+  @Roles('admin')
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @ApiConsumes('multipart/form-data')
   @FormDataRequest()
   @Patch('/:id')
@@ -103,6 +103,8 @@ export class PropertyController {
     description: 'Allows admin deletes property',
   })
   @ApiOkResponse({ description: 'Property deletion successful ', type: ApiResponseDTO })
+  @Roles('admin')
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @Delete('/:id')
   async deleteProperty(@Param('id') id: string, @Res() res: Response): Promise<ResponseDTO> {
     try {

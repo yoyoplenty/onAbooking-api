@@ -99,10 +99,16 @@ export class BaseRepository<T> {
     await this.repository.findByIdAndDelete(id).exec();
   }
 
+  async deleteMany(query: GenericRecord): Promise<void> {
+    await this.repository.deleteMany(query);
+  }
+
   private queryBuilder(query: GenericRecord = {}, populateOptions?: PopulateOptions[]): any {
     let queryBuilder: any = this.repository.find(query);
 
     if (populateOptions) queryBuilder = queryBuilder.populate(populateOptions);
+
+    queryBuilder = queryBuilder.sort({ createdAt: -1 });
 
     return queryBuilder;
   }

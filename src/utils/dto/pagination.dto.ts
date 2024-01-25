@@ -6,7 +6,4 @@ export class PaginationDto {
 
   @ApiPropertyOptional({ description: 'The number of limit' })
   limit?: number;
-
-  @ApiPropertyOptional({ description: 'Sort order', type: 'integer' })
-  sortOrder?: -1 | 1;
 }

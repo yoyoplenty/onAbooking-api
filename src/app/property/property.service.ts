@@ -86,9 +86,10 @@ export class PropertyService {
 
   async delete(id: ObjectId | string): Promise<ServiceResponse> {
     const property = await this.property.findById(new ObjectId(id));
-    if (property) throw new NotFoundException('property not found');
+    if (!property) throw new NotFoundException('property not found');
 
     await this.property.deleteById(new ObjectId(id));
+    await this.propertyImage.deleteMany({ propertyId: new ObjectId(id) });
 
     return { data: null, message: 'Property deleted successfully' };
   }

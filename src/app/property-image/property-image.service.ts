@@ -18,7 +18,7 @@ export class PropertyImageService {
 
   async delete(id: ObjectId | string): Promise<ServiceResponse> {
     const propertyImage = await this.propertyImage.findById(new ObjectId(id));
-    if (propertyImage) throw new NotFoundException('property image not found');
+    if (!propertyImage) throw new NotFoundException('property image not found');
 
     await this.propertyImage.deleteById(new ObjectId(id));
 

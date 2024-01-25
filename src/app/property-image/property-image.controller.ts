@@ -15,21 +15,17 @@ import { QueryPropertyImageDto } from './dto/query.dto';
 import { PropertyImage } from './model/property-images.model';
 import { PropertyImageService } from './property-image.service';
 
-@ApiTags('PropertyImage')
+@ApiTags('Property Images')
 @ApiUnprocessableEntityResponse({ status: 422, description: 'Error occurred', type: ApiResponseDTO })
-@Roles('admin')
-@UseGuards(JwtAuthGuard, RoleGuard)
-@Controller('api/v1/property_images')
+@Controller('api/v1/property-images')
 export class PropertyImageController {
   constructor(private readonly propertyImageService: PropertyImageService) {}
 
-  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Get property images',
     description: 'Allows admin get property images',
   })
   @ApiOkResponse({ description: 'Get property images successful ', type: [PropertyImage] })
-  @UseGuards(JwtAuthGuard)
   @Get()
   async findPropertyImages(@Res() res: Response, @Query() query: QueryPropertyImageDto): Promise<ResponseDTO> {
     try {
@@ -49,7 +45,8 @@ export class PropertyImageController {
     description: 'Allows admin delete property images',
   })
   @ApiOkResponse({ description: 'property images deleted successfully', type: [PropertyImage] })
-  @UseGuards(JwtAuthGuard)
+  @Roles('admin')
+  @UseGuards(JwtAuthGuard, RoleGuard)
   @Delete('/:id')
   async deletePropertyImage(@Param('id') id: string, @Res() res: Response): Promise<ResponseDTO> {
     try {
