@@ -17,10 +17,10 @@ export class AuthService {
   ) {}
 
   async register(registerPayload: RegisterDto): Promise<ServiceResponse> {
-    // const { email, phoneNumber } = registerPayload;
+    const { email, phoneNumber } = registerPayload;
 
-    // const userExists = await this.user.findOne({ [Op.or]: [{ email }, { phoneNumber }, { userName }] });
-    // if (userExists) throw new BadRequestException('user already exists');
+    const userExists = await this.user.findOne({ $or: [{ email }, { phoneNumber }] });
+    if (userExists) throw new BadRequestException('user already exists');
 
     registerPayload.password = await hashResource(registerPayload.password);
 
