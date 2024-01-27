@@ -64,25 +64,17 @@ export class BaseRepository<T> {
   async aggregateAndCount(query: any[], options?: AggregateOption): Promise<{ data: T[]; count: number }> {
     const aggregationPipeline: any[] = query || [];
 
-    let matchStage: any;
-
     if (options && options.limit !== undefined) aggregationPipeline.push({ $limit: Number(options.limit) });
 
     if (options && options.skip !== undefined) aggregationPipeline.push({ $skip: Number(options.skip) });
 
-    for (const stage of aggregationPipeline) {
-      if (stage && stage.$match) {
-        matchStage = stage.$match;
-        break;
-      }
-    }
+    const countPipeline = [...aggregationPipeline];
+    const count = await this.repository.aggregate(countPipeline.concat({ $count: 'count' })).exec();
 
-    const [data, count] = await Promise.all([
-      this.repository.aggregate(aggregationPipeline).exec(),
-      this.repository.countDocuments(matchStage || {}).exec(),
-    ]);
+    const dataPipeline = [...aggregationPipeline, { $limit: count[0]?.count || 0 }];
+    const data = await this.repository.aggregate(dataPipeline).exec();
 
-    return { data, count };
+    return { data, count: count[0]?.count || 0 };
   }
 
   async create(payload: GenericRecord): Promise<T> {
