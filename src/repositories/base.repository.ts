@@ -71,7 +71,9 @@ export class BaseRepository<T> {
     const countPipeline = [...aggregationPipeline];
     const count = await this.repository.aggregate(countPipeline.concat({ $count: 'count' })).exec();
 
-    const dataPipeline = [...aggregationPipeline, { $limit: count[0]?.count || 0 }];
+    const dataPipeline: any[] = [...aggregationPipeline];
+    if (count[0]?.count > 0) dataPipeline.push({ $limit: count[0]?.count });
+
     const data = await this.repository.aggregate(dataPipeline).exec();
 
     return { data, count: count[0]?.count || 0 };

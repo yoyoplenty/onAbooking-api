@@ -64,6 +64,8 @@ export class PropertyController {
 
       const filter = requestFilter(query);
 
+      console.log(offset, limit);
+
       const response = await this.propertyService.find(filter, offset, limit);
 
       return JsonResponse(res, response);
