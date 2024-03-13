@@ -20,6 +20,10 @@ export class User implements IUser {
 
   @ApiProperty()
   @Prop({ type: String })
+  userName: string;
+
+  @ApiProperty()
+  @Prop({ type: String })
   middleName: string;
 
   @ApiProperty()

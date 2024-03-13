@@ -5,45 +5,43 @@ import { AggregateOption } from '@on/utils/types';
 
 type GenericRecord = Record<string, any> | any;
 
+interface Options {
+  aggregate?: AggregateOption;
+  populate?: PopulateOptions[];
+  sort?: { [key: string]: number };
+}
+
 export class BaseRepository<T> {
   constructor(private readonly repository: Model<T>) {}
 
-  async find(
-    query?: GenericRecord,
-    populateOptions?: PopulateOptions[],
-    sortOptions?: { field: string; direction: number },
-  ): Promise<T[]> {
-    return await this.queryBuilder(query, populateOptions, sortOptions).exec();
+  async find(query?: GenericRecord, options?: Options): Promise<T[]> {
+    return await this.queryBuilder(query, options?.populate, options?.sort).exec();
   }
 
-  async findOne(query: GenericRecord, populateOptions?: PopulateOptions[]): Promise<T> {
+  async findOne(query: GenericRecord, options?: Options): Promise<T> {
     let queryBuilder: any = this.repository.findOne(query);
 
-    if (populateOptions) queryBuilder = queryBuilder.populate(populateOptions);
+    if (options && options.populate) queryBuilder = queryBuilder.populate(options.populate);
 
     return await queryBuilder.exec();
   }
 
-  async findById(id: ObjectId, populateOptions?: PopulateOptions[]): Promise<T> {
+  async findById(id: ObjectId, options?: Options): Promise<T> {
     let queryBuilder: any = this.repository.findById(id);
 
-    if (populateOptions) queryBuilder = queryBuilder.populate(populateOptions);
+    if (options && options.populate) queryBuilder = queryBuilder.populate(options.populate);
 
     return await queryBuilder.exec();
   }
 
-  async findAndCount(
-    query: GenericRecord,
-    options: AggregateOption,
-    populateOptions?: PopulateOptions[],
-  ): Promise<{ data: T[]; count: number }> {
-    const dataQueryBuilder = this.queryBuilder(query, populateOptions);
+  async findAndCount(query: GenericRecord, options: Options): Promise<{ data: T[]; count: number }> {
+    const dataQueryBuilder = this.queryBuilder(query, options.populate, options?.sort);
     const countQueryBuilder = this.repository.find(query);
 
     const [data, count] = await Promise.all([
       dataQueryBuilder
-        .skip(options.skip || 0)
-        .limit(options.limit || 0)
+        .skip(options.aggregate?.skip || 0)
+        .limit(options.aggregate?.limit || 0)
         .exec(),
       countQueryBuilder.countDocuments().exec(),
     ]);
@@ -51,22 +49,24 @@ export class BaseRepository<T> {
     return { data, count };
   }
 
-  async aggregate(query: any, options?: AggregateOption): Promise<T[]> {
+  async aggregate(query: any, options?: Options): Promise<T[]> {
     const aggregationPipeline: any[] = query;
+    const option = options?.aggregate;
 
-    if (options && options.limit !== undefined) aggregationPipeline.push({ $limit: Number(options.limit) });
+    if (option && option.limit !== undefined) aggregationPipeline.push({ $limit: Number(option.limit) });
 
-    if (options && options.skip !== undefined) aggregationPipeline.push({ $skip: Number(options.skip) });
+    if (option && option.skip !== undefined) aggregationPipeline.push({ $skip: Number(option.skip) });
 
     return await this.repository.aggregate(aggregationPipeline).exec();
   }
 
-  async aggregateAndCount(query: any[], options?: AggregateOption): Promise<{ data: T[]; count: number }> {
+  async aggregateAndCount(query: any[], options?: Options): Promise<{ data: T[]; count: number }> {
     const aggregationPipeline: any[] = query || [];
+    const option = options?.aggregate;
 
-    if (options && options.limit !== undefined) aggregationPipeline.push({ $limit: Number(options.limit) });
+    if (option && option.limit !== undefined) aggregationPipeline.push({ $limit: Number(option.limit) });
 
-    if (options && options.skip !== undefined) aggregationPipeline.push({ $skip: Number(options.skip) });
+    if (option && option.skip !== undefined) aggregationPipeline.push({ $skip: Number(option.skip) });
 
     const countPipeline = [...aggregationPipeline];
     const count = await this.repository.aggregate(countPipeline.concat({ $count: 'count' })).exec();
@@ -110,16 +110,17 @@ export class BaseRepository<T> {
   private queryBuilder(
     query: GenericRecord = {},
     populateOptions?: PopulateOptions[],
-    sortOptions?: { field: string; direction: number },
+    sortOptions?: { [key: string]: number }, // Updated
   ): any {
     let queryBuilder: any = this.repository.find(query);
 
     if (populateOptions) queryBuilder = queryBuilder.populate(populateOptions);
 
-    const defaultSortOptions = { field: 'createdAt', direction: -1 };
-    const finalSortOptions = sortOptions || defaultSortOptions;
+    const defaultSortField = 'createdAt';
+    const defaultSortDirection = -1;
+    const finalSortOptions = sortOptions || { [defaultSortField]: defaultSortDirection };
 
-    queryBuilder = queryBuilder.sort({ [finalSortOptions.field]: finalSortOptions.direction });
+    queryBuilder = queryBuilder.sort(finalSortOptions);
 
     return queryBuilder;
   }

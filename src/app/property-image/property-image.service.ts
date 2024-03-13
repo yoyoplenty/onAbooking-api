@@ -11,7 +11,7 @@ export class PropertyImageService {
   constructor(private readonly propertyImage: PropertyImageRepository) {}
 
   async find(filter: QueryPropertyImageDto): Promise<ServiceResponse> {
-    const data = await this.propertyImage.find(filter, [{ path: 'propertyId' }]);
+    const data = await this.propertyImage.find(filter, { populate: [{ path: 'propertyId' }] });
 
     return { data, message: `Properties successfully fetched` };
   }

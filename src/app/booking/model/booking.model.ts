@@ -20,6 +20,14 @@ export class Booking implements IBooking {
   userId: User;
 
   @ApiProperty()
+  @Prop({ required: false, type: Number })
+  adultNo: number;
+
+  @ApiProperty()
+  @Prop({ required: false, type: Number })
+  childNo: number;
+
+  @ApiProperty()
   @Prop({ required: true, type: Date })
   checkIn: Date;
 

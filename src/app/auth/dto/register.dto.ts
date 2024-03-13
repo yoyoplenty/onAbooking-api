@@ -19,6 +19,11 @@ export class RegisterDto implements IRegister {
   @ApiProperty({ description: 'User username' })
   @IsString()
   @IsOptional()
+  userName: string;
+
+  @ApiProperty({ description: 'User middlename' })
+  @IsString()
+  @IsOptional()
   middleName: string;
 
   @ApiProperty({ description: 'User email address' })

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsMongoId, IsNotEmpty, IsDateString } from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsDateString, IsNumber, IsOptional } from 'class-validator';
 import { ObjectId } from 'mongodb';
 
 import { IBooking } from '../types/booking.interface';
@@ -19,4 +19,14 @@ export class BookingDto implements IBooking {
   @IsDateString()
   @IsNotEmpty()
   checkOut: Date;
+
+  @ApiProperty({ description: 'The total no of adults to be present', type: Number })
+  @IsNumber()
+  @IsOptional()
+  adultNo: number;
+
+  @ApiProperty({ description: 'The total no of children to be present', type: Number })
+  @IsNumber()
+  @IsOptional()
+  childNo: number;
 }

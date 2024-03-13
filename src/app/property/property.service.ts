@@ -54,7 +54,7 @@ export class PropertyService {
           },
         },
       ],
-      { skip, limit },
+      { aggregate: { skip, limit } },
     );
 
     return { data, message: `Properties successfully fetched` };

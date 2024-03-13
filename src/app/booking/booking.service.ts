@@ -44,7 +44,10 @@ export class BookingService {
   }
 
   async find(filter: QueryBookingDto, skip?, limit?): Promise<ServiceResponse> {
-    const data = await this.booking.findAndCount(filter, { skip, limit }, [{ path: 'propertyId' }, { path: 'userId' }]);
+    const data = await this.booking.findAndCount(filter, {
+      aggregate: { skip, limit },
+      populate: [{ path: 'propertyId' }, { path: 'userId' }],
+    });
 
     return { data, message: `Bookings successfully fetched` };
   }
