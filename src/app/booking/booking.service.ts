@@ -86,7 +86,7 @@ export class BookingService {
 
     const { data } = await this.paystack.verifyPayment(reference);
 
-    if (data.status.toLowerCase()! == 'success') {
+    if (data.status.toLowerCase() !== 'success') {
       await this.transaction.updateOne({ reference }, { status: TRANSACTION_STATUS.FAILED });
 
       throw new BadRequestException(data.gateway_response);
@@ -95,7 +95,7 @@ export class BookingService {
     await this.booking.updateById(booking._id, { isPaid: true });
     await this.transaction.updateOne({ reference }, { status: TRANSACTION_STATUS.COMPLETED });
 
-    return { data: null, message: `Bookings successfully made` };
+    return { data: null, message: `Booking verified successfully` };
   }
 
   async find(filter: QueryBookingDto, skip?, limit?): Promise<ServiceResponse> {

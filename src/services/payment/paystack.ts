@@ -32,7 +32,7 @@ export class PaystackService {
     const { baseUrl, secretKey } = this;
 
     try {
-      const { data } = await axios.post(`${baseUrl}transaction/verify/${reference}`, {
+      const { data } = await axios.get(`${baseUrl}transaction/verify/${reference}`, {
         headers: {
           Authorization: `Bearer ${secretKey}`,
         },
