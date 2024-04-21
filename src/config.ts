@@ -28,4 +28,9 @@ export const config = {
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,
     apiSecret: process.env.CLOUDINARY_SECRET_KEY,
   },
+  paystack: {
+    baseUrl: process.env.PAYSTACK_BASE_URL,
+    publicKey: process.env.PAYSTACK_PUBLIC_KEY,
+    secretKey: process.env.PAYSTACK_SECRET_KEY,
+  },
 };

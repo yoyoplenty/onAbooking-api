@@ -19,3 +19,8 @@ export const validateFields = (field: string): string => {
   }
   return field;
 };
+
+export const isAdmin = (user) => {
+  if (user.role === 'admin' || user.role === 'super-admin') return true;
+  else return false;
+};

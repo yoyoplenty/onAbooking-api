@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { IsMongoId, IsNotEmpty, IsDateString, IsNumber, IsOptional } from 'class-validator';
 import { ObjectId } from 'mongodb';
 
@@ -29,4 +29,7 @@ export class BookingDto implements IBooking {
   @IsNumber()
   @IsOptional()
   childNo: number;
+
+  @ApiHideProperty()
+  isPaid: boolean;
 }

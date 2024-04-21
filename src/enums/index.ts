@@ -11,3 +11,9 @@ export enum PROPERTY_STATUS {
   AVAILABLE = 'available',
   BOOKED = 'booked',
 }
+
+export enum TRANSACTION_STATUS {
+  PENDING = 'pending',
+  FAILED = 'failed',
+  COMPLETED = 'completed',
+}

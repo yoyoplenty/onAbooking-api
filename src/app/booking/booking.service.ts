@@ -1,10 +1,13 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 
-import { PROPERTY_STATUS } from '@on/enums';
+import { PROPERTY_STATUS, TRANSACTION_STATUS } from '@on/enums';
+import { PaystackService } from '@on/services/payment/paystack';
 import { ServiceResponse } from '@on/utils/types';
 
 import { PropertyRepository } from '../property/repository/property.repository';
+import { TransactionRepository } from '../transaction/repository/transaction.repository';
+import { TransactionService } from '../transaction/transaction.service';
 
 import { UserDocument } from './../user/model/user.model';
 import { BookingDto } from './dto/book.dto';
@@ -17,11 +20,43 @@ import { IBooking } from './types/booking.interface';
 @Injectable()
 export class BookingService {
   constructor(
-    private readonly booking: BookingRepository,
+    private readonly transactionService: TransactionService,
+    private readonly transaction: TransactionRepository,
     private readonly property: PropertyRepository,
+    private readonly booking: BookingRepository,
+    private readonly paystack: PaystackService,
   ) {}
 
   async book(user: UserDocument, bookingPayload: BookingDto): Promise<ServiceResponse> {
+    const { propertyId, checkIn, checkOut } = bookingPayload;
+
+    const property = await this.property.findById(new ObjectId(propertyId));
+
+    if (!property) throw new NotFoundException('property not found');
+    if (property.status === PROPERTY_STATUS.BOOKED) throw new ConflictException('property already booked');
+
+    const transaction = await this.transaction.findOne({
+      propertyId,
+      userId: user._id,
+      status: TRANSACTION_STATUS.PENDING,
+    });
+    if (transaction) throw new UnprocessableEntityException('You have a pending transaction for this property');
+
+    const propertyAvailable = await this.isPropertyAvailable(new ObjectId(propertyId), checkIn, checkOut);
+    if (!propertyAvailable) throw new ConflictException('Property not available');
+
+    const payload: IBooking = {
+      propertyId: new ObjectId(propertyId),
+      userId: user._id,
+      ...bookingPayload,
+    };
+
+    const data = await this.booking.create(payload);
+
+    return { data, message: `Bookings successfully made` };
+  }
+
+  async verifyBooking(user: UserDocument, bookingPayload: BookingDto): Promise<ServiceResponse> {
     const { propertyId, checkIn, checkOut } = bookingPayload;
 
     const property = await this.property.findById(new ObjectId(propertyId));
@@ -80,7 +115,11 @@ export class BookingService {
     return { data: null, message: 'Booking deleted successfully' };
   }
 
-  async isPropertyAvailable(propertyId: ObjectId, proposedCheckIn: Date, proposedCheckOut: Date): Promise<boolean> {
+  private async isPropertyAvailable(
+    propertyId: ObjectId,
+    proposedCheckIn: Date,
+    proposedCheckOut: Date,
+  ): Promise<boolean> {
     const bookings = await this.booking.find({ propertyId });
 
     const checkInDate = new Date(proposedCheckIn);

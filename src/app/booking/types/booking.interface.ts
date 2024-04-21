@@ -11,4 +11,5 @@ export interface IBooking extends IBaseType {
   childNo: number;
   checkIn: Date;
   checkOut: Date;
+  isPaid: boolean;
 }

@@ -34,6 +34,10 @@ export class Booking implements IBooking {
   @ApiProperty()
   @Prop({ required: true, type: Date })
   checkOut: Date;
+
+  @ApiProperty()
+  @Prop({ required: true, type: Boolean, default: false })
+  isPaid: boolean;
 }
 
 export const BookingSchema = SchemaFactory.createForClass(Booking);
