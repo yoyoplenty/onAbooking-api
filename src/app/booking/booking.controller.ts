@@ -47,6 +47,23 @@ export class BookingController {
 
   @ApiBearerAuth()
   @ApiOperation({
+    summary: 'Verify Booking Payment',
+    description: 'Allows users verify booking payment',
+  })
+  @ApiOkResponse({ description: 'Verify booking successful ', type: ApiResponseDTO })
+  @Get('payment-verification/:reference')
+  async findTransactions(@Param('reference') reference: string, @Res() res: Response): Promise<ResponseDTO> {
+    try {
+      const response = await this.bookingService.verifyBooking(reference);
+
+      return JsonResponse(res, response);
+    } catch (error) {
+      return ErrorResponse(res, error);
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiOperation({
     summary: 'User gets his/her bookings',
     description: 'Allows users get bookings',
   })

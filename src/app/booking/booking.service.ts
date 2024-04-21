@@ -1,13 +1,22 @@
-import { ConflictException, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  UnprocessableEntityException,
+} from '@nestjs/common';
 import { ObjectId } from 'mongodb';
+import * as randomstring from 'randomstring';
 
 import { PROPERTY_STATUS, TRANSACTION_STATUS } from '@on/enums';
+import { IPayment } from '@on/services/payment/interface';
 import { PaystackService } from '@on/services/payment/paystack';
 import { ServiceResponse } from '@on/utils/types';
 
+import { PropertyDocument } from '../property/model/property.model';
 import { PropertyRepository } from '../property/repository/property.repository';
+import { CreateTransactionDto } from '../transaction/dto/create.dto';
 import { TransactionRepository } from '../transaction/repository/transaction.repository';
-import { TransactionService } from '../transaction/transaction.service';
 
 import { UserDocument } from './../user/model/user.model';
 import { BookingDto } from './dto/book.dto';
@@ -20,7 +29,6 @@ import { IBooking } from './types/booking.interface';
 @Injectable()
 export class BookingService {
   constructor(
-    private readonly transactionService: TransactionService,
     private readonly transaction: TransactionRepository,
     private readonly property: PropertyRepository,
     private readonly booking: BookingRepository,
@@ -45,37 +53,47 @@ export class BookingService {
     const propertyAvailable = await this.isPropertyAvailable(new ObjectId(propertyId), checkIn, checkOut);
     if (!propertyAvailable) throw new ConflictException('Property not available');
 
+    const reference = randomstring.generate(15);
+
     const payload: IBooking = {
       propertyId: new ObjectId(propertyId),
       userId: user._id,
+      paymentRef: reference,
       ...bookingPayload,
     };
 
+    const paymentPayload: IPayment = {
+      reference,
+      email: user.email,
+      amount: Number(property.price) * 100,
+      metaData: payload,
+    };
+
+    const response = await this.paystack.initializePayment(paymentPayload);
+    if (response.status !== true) throw new BadRequestException('unable to initialize payment');
+
+    await this.createTransaction(property, user._id, paymentPayload.reference);
     const data = await this.booking.create(payload);
 
     return { data, message: `Bookings successfully made` };
   }
 
-  async verifyBooking(user: UserDocument, bookingPayload: BookingDto): Promise<ServiceResponse> {
-    const { propertyId, checkIn, checkOut } = bookingPayload;
+  async verifyBooking(reference: string): Promise<ServiceResponse> {
+    const booking = await this.booking.findOne({ paymentRef: reference });
+    if (!booking) throw new NotFoundException('Booking with paymentRef not found');
 
-    const property = await this.property.findById(new ObjectId(propertyId));
+    const { data } = await this.paystack.verifyPayment(reference);
 
-    if (!property) throw new NotFoundException('property not found');
-    if (property.status === PROPERTY_STATUS.BOOKED) throw new ConflictException('property already booked');
+    if (data.status.toLowerCase()! == 'success') {
+      await this.transaction.updateOne({ reference }, { status: TRANSACTION_STATUS.FAILED });
 
-    const propertyAvailable = await this.isPropertyAvailable(new ObjectId(propertyId), checkIn, checkOut);
-    if (!propertyAvailable) throw new ConflictException('Property not available');
+      throw new BadRequestException(data.gateway_response);
+    }
 
-    const payload: IBooking = {
-      propertyId: new ObjectId(propertyId),
-      userId: user._id,
-      ...bookingPayload,
-    };
+    await this.booking.updateById(booking._id, { isPaid: true });
+    await this.transaction.updateOne({ reference }, { status: TRANSACTION_STATUS.COMPLETED });
 
-    const data = await this.booking.create(payload);
-
-    return { data, message: `Bookings successfully made` };
+    return { data: null, message: `Bookings successfully made` };
   }
 
   async find(filter: QueryBookingDto, skip?, limit?): Promise<ServiceResponse> {
@@ -139,5 +157,17 @@ export class BookingService {
     );
 
     return isAvailable && !isOverlapping;
+  }
+
+  private async createTransaction(property: PropertyDocument, userId: ObjectId, reference: string) {
+    const payload: CreateTransactionDto = {
+      propertyId: property._id,
+      userId,
+      amount: property.price,
+      status: TRANSACTION_STATUS.PENDING,
+      reference,
+    };
+
+    return await this.transaction.create(payload);
   }
 }

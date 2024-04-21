@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import mongoose, { HydratedDocument, ObjectId } from 'mongoose';
+import { ObjectId } from 'mongodb';
+import mongoose, { HydratedDocument } from 'mongoose';
 
 import { Property } from '@on/app/property/model/property.model';
 import { User } from '@on/app/user/model/user.model';

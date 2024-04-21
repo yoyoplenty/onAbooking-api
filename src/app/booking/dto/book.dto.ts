@@ -32,4 +32,7 @@ export class BookingDto implements IBooking {
 
   @ApiHideProperty()
   isPaid: boolean;
+
+  @ApiHideProperty()
+  paymentRef: string;
 }

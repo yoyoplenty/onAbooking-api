@@ -1,6 +1,6 @@
 import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsMongoId, IsNumber } from 'class-validator';
-import { ObjectId } from 'mongoose';
+import { ObjectId } from 'mongodb';
 
 import { TRANSACTION_STATUS } from '@on/enums';
 

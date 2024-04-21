@@ -12,4 +12,5 @@ export interface IBooking extends IBaseType {
   checkIn: Date;
   checkOut: Date;
   isPaid: boolean;
+  paymentRef: string;
 }

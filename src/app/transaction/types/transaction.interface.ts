@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongoose';
+import { ObjectId } from 'mongodb';
 
 import { Property } from '@on/app/property/model/property.model';
 import { User } from '@on/app/user/model/user.model';

@@ -22,11 +22,11 @@ import { TransactionService } from './transaction.service';
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Get Transactions',
     description: 'Allows users get their transactions',
   })
-  @ApiBearerAuth()
   @ApiOkResponse({ description: 'Get transaction successful ', type: [Transaction] })
   @UseGuards(JwtAuthGuard)
   @Get()
