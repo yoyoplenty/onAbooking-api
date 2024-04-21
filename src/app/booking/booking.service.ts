@@ -73,6 +73,8 @@ export class BookingService {
     if (response.status !== true) throw new BadRequestException('unable to initialize payment');
 
     await this.createTransaction(property, user._id, paymentPayload.reference);
+
+    payload.paymentUrl = response.data.authorization_url;
     const data = await this.booking.create(payload);
 
     return { data, message: `Bookings successfully made` };

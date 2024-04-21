@@ -41,6 +41,10 @@ export class Booking implements IBooking {
 
   @ApiProperty()
   @Prop({ required: true, type: String })
+  paymentUrl: string;
+
+  @ApiProperty()
+  @Prop({ required: true, type: String })
   paymentRef: string;
 }
 

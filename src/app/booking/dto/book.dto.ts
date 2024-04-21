@@ -35,4 +35,7 @@ export class BookingDto implements IBooking {
 
   @ApiHideProperty()
   paymentRef: string;
+
+  @ApiHideProperty()
+  paymentUrl: string;
 }
