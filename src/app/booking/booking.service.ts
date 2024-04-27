@@ -8,6 +8,7 @@ import {
 import { ObjectId } from 'mongodb';
 import * as randomstring from 'randomstring';
 
+import { config } from '@on/config';
 import { PROPERTY_STATUS, TRANSACTION_STATUS } from '@on/enums';
 import { IPayment } from '@on/services/payment/interface';
 import { PaystackService } from '@on/services/payment/paystack';
@@ -25,6 +26,8 @@ import { UpdateBookingDto } from './dto/update.dto';
 import { Booking } from './model/booking.model';
 import { BookingRepository } from './repository/booking.repository';
 import { IBooking } from './types/booking.interface';
+
+const baseUrl = config.app.baseUrl;
 
 @Injectable()
 export class BookingService {
@@ -66,6 +69,7 @@ export class BookingService {
       reference,
       email: user.email,
       amount: Number(property.price) * 100,
+      callback_url: `${baseUrl}payment_hotel.html?propertyId=${propertyId}&userId=${user._id}`,
       metaData: payload,
     };
 
