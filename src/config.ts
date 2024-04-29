@@ -4,7 +4,7 @@ dotenv.config();
 export const config = {
   port: process.env.PORT,
   app: {
-    baseUrl: process.env.BASE_URL || 'https://onabooking.com/',
+    baseUrl: process.env.BASE_URL || 'http://127.0.0.1:5500/',
   },
   email: {
     defaultFrom: process.env.EMAIL_DEFAULT_FROM,
