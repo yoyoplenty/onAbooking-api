@@ -88,6 +88,8 @@ export class BookingService {
     const booking = await this.booking.findOne({ paymentRef: reference });
     if (!booking) throw new NotFoundException('Booking with paymentRef not found');
 
+    const { propertyId } = booking;
+
     const { data } = await this.paystack.verifyPayment(reference);
 
     if (data.status.toLowerCase() !== 'success') {
@@ -98,6 +100,7 @@ export class BookingService {
 
     await this.booking.updateById(booking._id, { isPaid: true });
     await this.transaction.updateOne({ reference }, { status: TRANSACTION_STATUS.COMPLETED });
+    await this.property.updateById(new ObjectId(String(propertyId)), { status: PROPERTY_STATUS.BOOKED });
 
     return { data: null, message: `Booking verified successfully` };
   }
