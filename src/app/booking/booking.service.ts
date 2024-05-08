@@ -1,10 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-  UnprocessableEntityException,
-} from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 import * as randomstring from 'randomstring';
 
@@ -45,13 +39,6 @@ export class BookingService {
 
     if (!property) throw new NotFoundException('property not found');
     if (property.status === PROPERTY_STATUS.BOOKED) throw new ConflictException('property already booked');
-
-    const transaction = await this.transaction.findOne({
-      propertyId,
-      userId: user._id,
-      status: TRANSACTION_STATUS.PENDING,
-    });
-    if (transaction) throw new UnprocessableEntityException('You have a pending transaction for this property');
 
     const propertyAvailable = await this.isPropertyAvailable(new ObjectId(propertyId), checkIn, checkOut);
     if (!propertyAvailable) throw new ConflictException('Property not available');
