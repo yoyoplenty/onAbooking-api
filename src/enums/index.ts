@@ -17,3 +17,8 @@ export enum TRANSACTION_STATUS {
   FAILED = 'failed',
   COMPLETED = 'completed',
 }
+
+export enum LOCATION_TYPE {
+  LEKKI = 'lekki',
+  SURULERE = 'surulere',
+}
