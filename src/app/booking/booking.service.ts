@@ -46,6 +46,9 @@ export class BookingService {
     const propertyAvailable = await this.isPropertyAvailable(new ObjectId(propertyId), checkIn, checkOut);
     if (!propertyAvailable) throw new ConflictException('Property not available');
 
+    const numberOfDays = differenceInCalendarDays(new Date(checkOut), new Date(checkIn));
+    if (numberOfDays < 2) throw new BadRequestException('You cannot book less than 2 days');
+
     const reference = randomstring.generate(15);
 
     const payload: IBooking = {
@@ -55,7 +58,6 @@ export class BookingService {
       ...bookingPayload,
     };
 
-    const numberOfDays = differenceInCalendarDays(new Date(checkOut), new Date(checkIn));
     const bookingAmount = numberOfDays * Number(property.price) * 100;
 
     const paymentPayload: IPayment = {
