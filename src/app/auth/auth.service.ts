@@ -2,6 +2,8 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { JwtService } from '@nestjs/jwt';
 
 import { compareResource, hashResource } from '@on/helpers/password';
+import { EmailRecipient, sendEmail } from '@on/services/email';
+import { sharedEmailTemplate } from '@on/services/email/templates/shared.template';
 import { ServiceResponse } from '@on/utils/types';
 
 import { UserRepository } from '../user/repository/user.repository';
@@ -26,6 +28,12 @@ export class AuthService {
 
     const data = await this.user.create(registerPayload);
 
+    const { subject, content, name } = this.generateEmailContent(data);
+    const value = sharedEmailTemplate({ subject, content, name });
+
+    const recipient: EmailRecipient = { email: data.email, name: data.firstName };
+    await sendEmail({ recipient, value, subject });
+
     return { data, message: 'user registered successfully' };
   }
 
@@ -43,5 +51,19 @@ export class AuthService {
     const token = this.jwtService.sign(user.toObject());
 
     return { data: { user, token }, message: 'Login Successful' };
+  }
+
+  private generateEmailContent(user: { userName: string; email: string }) {
+    const subject = `Welcome to OnABooking, ${user.userName}!<br/>`;
+
+    const content = `
+    Welcome to OnABooking! We are delighted to have you with us.<br/>
+
+    At OnABooking, we strive to provide you with the best booking experience for properties around the world. Whether you're planning a vacation or a business trip, we've got you covered.<br/><br/>
+
+    If you have any questions or need assistance, please do not hesitate to contact us.<br/><br/>
+  `;
+
+    return { subject, content, name: user.userName };
   }
 }

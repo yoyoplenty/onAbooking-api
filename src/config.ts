@@ -33,4 +33,9 @@ export const config = {
     publicKey: process.env.PAYSTACK_PUBLIC_KEY,
     secretKey: process.env.PAYSTACK_SECRET_KEY,
   },
+  sendChamp: {
+    sender: process.env.SENDCHAMP_SENDER,
+    baseUrl: process.env.SENDCHAMP_BASE_URL,
+    apiKey: process.env.SENDCHAMP_API_KEY,
+  },
 };

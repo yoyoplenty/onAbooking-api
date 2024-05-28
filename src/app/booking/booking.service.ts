@@ -1,9 +1,12 @@
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { differenceInCalendarDays } from 'date-fns';
 import { ObjectId } from 'mongodb';
 import * as randomstring from 'randomstring';
 
 import { config } from '@on/config';
 import { PROPERTY_STATUS, TRANSACTION_STATUS } from '@on/enums';
+import { EmailRecipient, sendEmail } from '@on/services/email';
+import { sharedEmailTemplate } from '@on/services/email/templates/shared.template';
 import { IPayment } from '@on/services/payment/interface';
 import { PaystackService } from '@on/services/payment/paystack';
 import { ServiceResponse } from '@on/utils/types';
@@ -52,10 +55,13 @@ export class BookingService {
       ...bookingPayload,
     };
 
+    const numberOfDays = differenceInCalendarDays(new Date(checkOut), new Date(checkIn));
+    const bookingAmount = numberOfDays * Number(property.price) * 100;
+
     const paymentPayload: IPayment = {
       reference,
       email: user.email,
-      amount: Number(property.price) * 100,
+      amount: bookingAmount,
       callback_url: `${baseUrl}payment_hotel.html?propertyId=${propertyId}&userId=${user._id}`,
       metaData: payload,
     };
@@ -72,7 +78,10 @@ export class BookingService {
   }
 
   async verifyBooking(reference: string): Promise<ServiceResponse> {
-    const booking = await this.booking.findOne({ paymentRef: reference });
+    const booking = await this.booking.findOne(
+      { paymentRef: reference },
+      { populate: [{ path: 'propertyId' }, { path: 'userId' }] },
+    );
     if (!booking) throw new NotFoundException('Booking with paymentRef not found');
 
     const { propertyId } = booking;
@@ -88,6 +97,12 @@ export class BookingService {
     await this.booking.updateById(booking._id, { isPaid: true });
     await this.transaction.updateOne({ reference }, { status: TRANSACTION_STATUS.COMPLETED });
     await this.property.updateById(new ObjectId(String(propertyId)), { status: PROPERTY_STATUS.BOOKED });
+
+    const { subject, content, name } = this.generateEmailContent(booking);
+    const value = sharedEmailTemplate({ subject, content, name });
+
+    const recipient: EmailRecipient = { email: booking.userId.email, name: booking.userId.firstName };
+    await sendEmail({ recipient, value, subject });
 
     return { data: null, message: `Booking verified successfully` };
   }
@@ -165,5 +180,22 @@ export class BookingService {
     };
 
     return await this.transaction.create(payload);
+  }
+
+  private generateEmailContent(booking: Booking) {
+    const { userId, propertyId, checkIn } = booking;
+
+    const subject = `Booking Confirmation for ${propertyId.name}<br/>`;
+
+    const content = `
+    Thank you for booking ${propertyId.name} with us!<br/><br/>
+
+    Here are your booking details:<br/>
+    - Property Name: ${propertyId.name} <br/>
+    - Booking Date: ${checkIn} <br/>
+
+    We are excited to host you and ensure you have a pleasant stay.<br/><br/>
+  `;
+    return { subject, content, name: userId.firstName };
   }
 }
