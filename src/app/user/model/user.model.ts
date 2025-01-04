@@ -13,11 +13,11 @@ export type UserDocument = HydratedDocument<User>;
 @Schema({ collection: 'users', versionKey: false, timestamps: true })
 export class User implements IUser {
   @ApiProperty()
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: false })
   firstName: string;
 
   @ApiProperty()
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: false })
   lastName: string;
 
   @ApiProperty()
@@ -25,27 +25,27 @@ export class User implements IUser {
   middleName: string;
 
   @ApiProperty()
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: false })
   email: string;
 
   @ApiProperty()
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: false })
   country: string;
 
   @ApiProperty()
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: false })
   countryCode: string;
 
   @ApiProperty()
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: false })
   phoneNumber: string;
 
   @ApiProperty()
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: false })
   password: string;
 
   @ApiProperty()
-  @Prop({ type: String, required: true })
+  @Prop({ type: String, required: false })
   dob: string;
 
   @ApiProperty()
@@ -53,7 +53,7 @@ export class User implements IUser {
   role: ROLE;
 
   @ApiProperty()
-  @Prop({ type: ProfileSchema, required: true })
+  @Prop({ type: ProfileSchema, required: false })
   profile: IProfile;
 
   @ApiProperty()

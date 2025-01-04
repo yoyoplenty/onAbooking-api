@@ -1,9 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { compareResource, hashResource } from '@on/helpers/password';
-import { EmailRecipient, sendEmail } from '@on/services/email';
-import { sharedEmailTemplate } from '@on/services/email/templates/shared.template';
+import { ROLE } from '@on/enums';
+import { compareResource } from '@on/helpers/password';
 import { ServiceResponse } from '@on/utils/types';
 
 import { UserRepository } from '../user/repository/user.repository';
@@ -19,20 +18,16 @@ export class AuthService {
   ) {}
 
   async register(registerPayload: RegisterDto): Promise<ServiceResponse> {
-    const { email, phoneNumber } = registerPayload;
+    const { country, countryCode, phoneNumber, role = ROLE.GUEST } = registerPayload;
 
-    const userExists = await this.user.findOne({ $or: [{ email }, { phoneNumber }] });
+    const userExists = await this.user.findOne({ countryCode, phoneNumber });
     if (userExists) throw new BadRequestException('user already exists');
 
-    registerPayload.password = await hashResource(registerPayload.password);
+    const userPayload = { country, role, ...registerPayload };
 
-    const data = await this.user.create(registerPayload);
+    const data = await this.user.create(userPayload);
 
-    const { subject, content, name } = this.generateEmailContent(data);
-    const value = sharedEmailTemplate({ subject, content, name });
-
-    const recipient: EmailRecipient = { email: data.email, name: data.firstName };
-    await sendEmail({ recipient, value, subject });
+    //SEND PHONE OTP
 
     return { data, message: 'user registered successfully' };
   }
@@ -51,19 +46,5 @@ export class AuthService {
     const token = this.jwtService.sign(user.toObject());
 
     return { data: { user, token }, message: 'Login Successful' };
-  }
-
-  private generateEmailContent(user: { lastName: string; email: string }) {
-    const subject = `Welcome to OnABooking, ${user.lastName}!<br/>`;
-
-    const content = `
-    Welcome to OnABooking! We are delighted to have you with us.<br/>
-
-    At OnABooking, we strive to provide you with the best booking experience for properties around the world. Whether you're planning a vacation or a business trip, we've got you covered.<br/><br/>
-
-    If you have any questions or need assistance, please do not hesitate to contact us.<br/><br/>
-  `;
-
-    return { subject, content, name: user.lastName };
   }
 }

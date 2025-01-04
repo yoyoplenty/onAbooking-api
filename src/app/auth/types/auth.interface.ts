@@ -1,8 +1,5 @@
 import { IUser } from '@on/app/user/types/user.interface';
 
-export type IRegister = Pick<
-  IUser,
-  'firstName' | 'lastName' | 'middleName' | 'email' | 'password' | 'role' | 'phoneNumber'
->;
+export type IRegister = Pick<IUser, 'country' | 'countryCode' | 'phoneNumber'>;
 
-export type ILogin = Pick<IRegister, 'email' | 'password'>;
+export type ILogin = Partial<Pick<IUser, 'email' | 'countryCode' | 'phoneNumber'>> & Pick<IUser, 'password'>;
