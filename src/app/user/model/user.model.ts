@@ -58,7 +58,11 @@ export class User implements IUser {
 
   @ApiProperty()
   @Prop({ type: Boolean, required: true, default: false })
-  isVerified: boolean;
+  isPhoneVerified: boolean;
+
+  @ApiProperty()
+  @Prop({ type: Boolean, required: true, default: false })
+  isEmailVerified: boolean;
 
   @ApiProperty()
   @Prop({ enum: USER_STATUS, required: true, default: USER_STATUS.INACTIVE })

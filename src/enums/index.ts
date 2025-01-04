@@ -14,6 +14,11 @@ export enum PROPERTY_TYPE {
   HOTEL = 'hotel',
 }
 
+export enum TOKEN_TYPE {
+  EMAIL = 'email',
+  PHONE = 'phone',
+}
+
 export enum TRANSACTION_TYPE {
   DEBIT = 'debit',
   CREDIT = 'credit',

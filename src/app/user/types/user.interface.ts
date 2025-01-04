@@ -13,7 +13,8 @@ export interface IUser extends IBaseType {
   dob: string;
   role: ROLE;
   profile: IProfile;
-  isVerified: boolean;
+  isPhoneVerified: boolean;
+  isEmailVerified: boolean;
   status: USER_STATUS;
   referralCode: string;
   lastLogin: Date;
