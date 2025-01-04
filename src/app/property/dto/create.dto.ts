@@ -1,7 +1,7 @@
 import { ApiHideProperty, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsOptional, IsEnum } from 'class-validator';
 
-import { LOCATION_TYPE, PROPERTY_STATUS, PROPERTY_TYPE } from '@on/enums';
+import { PROPERTY_STATUS, PROPERTY_TYPE } from '@on/enums';
 import { PropertyUploadDto } from '@on/utils/dto/property-upload.dto';
 
 export class CreatePropertyDto extends PropertyUploadDto {
@@ -28,11 +28,6 @@ export class CreatePropertyDto extends PropertyUploadDto {
   @IsEnum(PROPERTY_TYPE)
   @IsOptional()
   type: PROPERTY_TYPE;
-
-  @ApiPropertyOptional({ description: 'Property Location', enum: LOCATION_TYPE })
-  @IsEnum(LOCATION_TYPE)
-  @IsOptional()
-  location: LOCATION_TYPE;
 
   @ApiPropertyOptional({ description: 'Property status', enum: PROPERTY_STATUS })
   @IsEnum(PROPERTY_STATUS)

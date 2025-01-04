@@ -9,6 +9,8 @@ interface Options {
   aggregate?: AggregateOption;
   populate?: PopulateOptions[];
   sort?: { [key: string]: number };
+  select?: string[];
+  projection?: { [key: string]: number };
 }
 
 export class BaseRepository<T> {
@@ -26,20 +28,22 @@ export class BaseRepository<T> {
     return await queryBuilder.exec();
   }
 
-  async findById(id: ObjectId, options?: Options): Promise<T> {
-    let queryBuilder: any = this.repository.findById(id);
+  async findById(id: string | ObjectId, options?: Options): Promise<T> {
+    const objectId = new ObjectId(String(id));
+    let queryBuilder: any = this.repository.findById(objectId);
 
     if (options && options.populate) queryBuilder = queryBuilder.populate(options.populate);
 
     return await queryBuilder.exec();
   }
 
-  async findAndCount(query: GenericRecord, options: Options): Promise<{ data: T[]; count: number }> {
+  async findAndCount(query: GenericRecord, options?: Options): Promise<{ data: T[]; count: number }> {
     const dataQueryBuilder = this.queryBuilder(query, options.populate, options?.sort);
     const countQueryBuilder = this.repository.find(query);
 
     const [data, count] = await Promise.all([
       dataQueryBuilder
+        .select(options.select || '')
         .skip(options.aggregate?.skip || 0)
         .limit(options.aggregate?.limit || 0)
         .exec(),
@@ -58,6 +62,10 @@ export class BaseRepository<T> {
     if (option && option.skip !== undefined) aggregationPipeline.push({ $skip: Number(option.skip) });
 
     return await this.repository.aggregate(aggregationPipeline).exec();
+  }
+
+  async distinct(field: string, query?: GenericRecord): Promise<any[]> {
+    return await this.repository.distinct(field, query).exec();
   }
 
   async aggregateAndCount(query: any[], options?: Options): Promise<{ data: T[]; count: number }> {
@@ -91,16 +99,19 @@ export class BaseRepository<T> {
     return await this.repository.findOneAndUpdate(query, update, { new: true }).exec();
   }
 
-  async updateById(id: ObjectId, update: GenericRecord): Promise<T | null> {
-    return await this.repository.findByIdAndUpdate(id, update, { new: true }).exec();
+  async updateById(id: string | ObjectId, update: GenericRecord, options?: GenericRecord): Promise<T | any> {
+    const objectId = new ObjectId(String(id));
+
+    return await this.repository.findByIdAndUpdate(objectId, update, { new: true, ...options }).exec();
   }
 
   async deleteOne(query: GenericRecord): Promise<void> {
     await this.repository.deleteOne(query).exec();
   }
 
-  async deleteById(id: ObjectId): Promise<void> {
-    await this.repository.findByIdAndDelete(id).exec();
+  async deleteById(id: string | ObjectId): Promise<void> {
+    const objectId = new ObjectId(String(id));
+    await this.repository.findByIdAndDelete(objectId).exec();
   }
 
   async deleteMany(query: GenericRecord): Promise<void> {
@@ -110,9 +121,10 @@ export class BaseRepository<T> {
   private queryBuilder(
     query: GenericRecord = {},
     populateOptions?: PopulateOptions[],
-    sortOptions?: { [key: string]: number }, // Updated
+    sortOptions?: { [key: string]: number },
+    projectionOptions?: { [key: string]: number },
   ): any {
-    let queryBuilder: any = this.repository.find(query);
+    let queryBuilder: any = this.repository.find(query, projectionOptions);
 
     if (populateOptions) queryBuilder = queryBuilder.populate(populateOptions);
 

@@ -173,10 +173,11 @@ export class BookingService {
   }
 
   private async createTransaction(property: PropertyDocument, userId: ObjectId, reference: string) {
-    const payload: CreateTransactionDto = {
+    const payload: CreateTransactionDto | any = {
       propertyId: property._id,
       userId,
-      amount: property.price,
+      // amount: property.price,
+      amount: null,
       status: TRANSACTION_STATUS.PENDING,
       reference,
     };

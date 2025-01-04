@@ -4,9 +4,6 @@ import { ROLE } from '@on/enums';
 import { QueryDto } from '@on/utils/dto/query.dto';
 
 export class QueryUserDto extends QueryDto {
-  @ApiPropertyOptional({ description: 'username' })
-  userName?: string;
-
   @ApiPropertyOptional({ description: 'first name' })
   firstName?: string;
 
@@ -18,6 +15,12 @@ export class QueryUserDto extends QueryDto {
 
   @ApiPropertyOptional({ description: 'email' })
   email?: string;
+
+  @ApiPropertyOptional({ description: 'email' })
+  country?: string;
+
+  @ApiPropertyOptional({ description: 'email' })
+  status?: string;
 
   @ApiPropertyOptional({ description: 'role' })
   role?: ROLE;

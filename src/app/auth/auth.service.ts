@@ -53,8 +53,8 @@ export class AuthService {
     return { data: { user, token }, message: 'Login Successful' };
   }
 
-  private generateEmailContent(user: { userName: string; email: string }) {
-    const subject = `Welcome to OnABooking, ${user.userName}!<br/>`;
+  private generateEmailContent(user: { lastName: string; email: string }) {
+    const subject = `Welcome to OnABooking, ${user.lastName}!<br/>`;
 
     const content = `
     Welcome to OnABooking! We are delighted to have you with us.<br/>
@@ -64,6 +64,6 @@ export class AuthService {
     If you have any questions or need assistance, please do not hesitate to contact us.<br/><br/>
   `;
 
-    return { subject, content, name: user.userName };
+    return { subject, content, name: user.lastName };
   }
 }

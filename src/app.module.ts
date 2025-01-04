@@ -7,7 +7,9 @@ import { AuthModule } from './app/auth/auth.module';
 import { BookingModule } from './app/booking/booking.module';
 import { PropertyModule } from './app/property/property.module';
 import { PropertyImageModule } from './app/property-image/property-image.module';
+import { ReviewModule } from './app/review/review.module';
 import { TransactionModule } from './app/transaction/transaction.module';
+import { UnavailabilityModule } from './app/unavailability/unavailability.module';
 import { UserModule } from './app/user/user.module';
 import { AppController } from './app.controller';
 import { config } from './config';
@@ -20,10 +22,12 @@ import LoggerMiddleware from './middlewares/logger';
     UserModule,
     AuthModule,
     AdminModule,
+    ReviewModule,
     BookingModule,
     PropertyModule,
     TransactionModule,
     PropertyImageModule,
+    UnavailabilityModule,
   ],
   controllers: [AppController],
   providers: [

@@ -1,10 +1,22 @@
 export enum ROLE {
-  USER = 'user',
+  GUEST = 'quest',
+  HOST = 'host',
   ADMIN = 'admin',
 }
+
+export enum USER_STATUS {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+}
+
 export enum PROPERTY_TYPE {
   APARTMENT = 'apartment',
   HOTEL = 'hotel',
+}
+
+export enum TRANSACTION_TYPE {
+  DEBIT = 'debit',
+  CREDIT = 'credit',
 }
 
 export enum PROPERTY_STATUS {
@@ -16,9 +28,4 @@ export enum TRANSACTION_STATUS {
   PENDING = 'pending',
   FAILED = 'failed',
   COMPLETED = 'completed',
-}
-
-export enum LOCATION_TYPE {
-  LEKKI = 'lekki',
-  SURULERE = 'surulere',
 }

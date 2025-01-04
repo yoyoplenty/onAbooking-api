@@ -30,7 +30,7 @@ export interface MailPayload {
 export async function sendEmail(payload: MailPayload): Promise<void> {
   const { value, recipient, subject } = payload;
 
-  const url = `${baseUrl}/email/send`;
+  const url = `${baseUrl}email/send`;
 
   const headers = {
     Accept: 'application/json',
