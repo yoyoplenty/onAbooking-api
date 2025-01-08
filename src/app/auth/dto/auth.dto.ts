@@ -1,6 +1,7 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
+import { UserDto } from '@on/app/user/dto/user.dto';
 import { ROLE } from '@on/enums';
 import { PhoneDto, PhoneEmailDto } from '@on/utils/dto/shared.dto';
 
@@ -8,7 +9,7 @@ import { ILogin, IRegister } from '../types/auth.interface';
 
 export class RegisterDto extends PhoneDto implements IRegister {
   @ApiProperty({ description: 'User country' })
-  @IsEmail()
+  @IsString()
   @IsNotEmpty()
   country: string;
 
@@ -16,6 +17,8 @@ export class RegisterDto extends PhoneDto implements IRegister {
   @ApiProperty({ enum: ROLE, description: 'User role (admin or user)' })
   role: ROLE;
 }
+
+export class CompleteRegistrationDto extends OmitType(UserDto, ['role', 'country', 'profile'] as const) {}
 
 export class LoginDto extends PhoneEmailDto implements ILogin {
   @ApiProperty({ example: 'Admin100' })

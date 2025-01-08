@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { HydratedDocument } from 'mongoose';
+import { Document, HydratedDocument } from 'mongoose';
 
 import { ROLE, USER_STATUS } from '@on/enums';
 
@@ -11,7 +11,7 @@ import { ProfileSchema } from './profile.model';
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({ collection: 'users', versionKey: false, timestamps: true })
-export class User implements IUser {
+export class User extends Document implements IUser {
   @ApiProperty()
   @Prop({ type: String, required: false })
   firstName: string;

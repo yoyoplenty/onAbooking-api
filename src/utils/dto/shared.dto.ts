@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsOptional, IsString } from 'class-validator';
 
 export class PhoneDto {
-  @ApiProperty({ description: 'Country code of the user', example: 'admin@mailinator.com' })
+  @ApiProperty({ description: 'Country code of the user', example: '234' })
   @IsString()
   @IsOptional()
   countryCode: string;

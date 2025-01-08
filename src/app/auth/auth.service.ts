@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
-import { ROLE, TOKEN_TYPE } from '@on/enums';
+import { ROLE, TOKEN_TYPE, USER_STATUS } from '@on/enums';
 import { getRandomNumber } from '@on/helpers';
 import { compareResource, hashResource } from '@on/helpers/password';
+import { smsService } from '@on/services/sms/sms.service';
 import { PhoneEmailDto } from '@on/utils/dto/shared.dto';
 import { ServiceResponse } from '@on/utils/types';
 
@@ -11,7 +12,7 @@ import { User } from '../user/model/user.model';
 import { UserRepository } from '../user/repository/user.repository';
 import { TokenRepository } from '../user/repository/wallet.repository copy';
 
-import { LoginDto, RegisterDto, ResetPasswordDto } from './dto/auth.dto';
+import { CompleteRegistrationDto, LoginDto, RegisterDto, ResetPasswordDto } from './dto/auth.dto';
 import { EmailVerificationDto, PhoneVerificationDto } from './dto/otp.dto';
 
 @Injectable()
@@ -19,14 +20,21 @@ export class AuthService {
   constructor(
     private readonly user: UserRepository,
     private readonly token: TokenRepository,
-    private readonly jwtService: JwtService,
+    private readonly jwt: JwtService,
+    private readonly sms: smsService,
   ) {}
 
   public async register(registerPayload: RegisterDto): Promise<ServiceResponse> {
     const { country, countryCode, phoneNumber, role = ROLE.GUEST } = registerPayload;
 
     const userExists = await this.user.findOne({ countryCode, phoneNumber });
-    if (userExists) throw new BadRequestException('user already exists');
+    if (userExists) {
+      if (!userExists.isPhoneVerified) {
+        await this.sendOTP(TOKEN_TYPE.PHONE, userExists);
+        throw new ConflictException('User exists, verification OTP sent successfully.');
+      }
+      throw new ConflictException('user already exists');
+    }
 
     const userPayload = { country, role, ...registerPayload };
 
@@ -34,13 +42,37 @@ export class AuthService {
 
     await this.sendOTP(TOKEN_TYPE.PHONE, user);
 
-    return { data: user, message: 'user registered successfully' };
+    return { data: user, message: 'User registered successfully. OTP sent for verification.' };
   }
 
   public async resendVerification(payload: PhoneEmailDto): Promise<ServiceResponse> {
     await this.sendVerification(payload);
 
     return { data: null, message: 'Verification otp sent' };
+  }
+
+  public async completeRegister(payload: CompleteRegistrationDto): Promise<ServiceResponse> {
+    const { countryCode, phoneNumber, password } = payload;
+
+    const user = await this.user.findOne({ countryCode, phoneNumber });
+    if (!user) throw new NotFoundException('user not found');
+
+    if (!user.isPhoneVerified) {
+      await this.sendOTP(TOKEN_TYPE.PHONE, user);
+      throw new NotFoundException('User phone not verified, Verification OTP sent successfully.');
+    }
+
+    const updatePayload = {
+      ...payload,
+      status: USER_STATUS.ACTIVE,
+      password: await hashResource(password),
+    };
+
+    await this.user.updateById(user._id, updatePayload);
+
+    await this.sendOTP(TOKEN_TYPE.EMAIL, user);
+
+    return { data: user, message: 'Registration completed successfully. OTP sent to email for verification.' };
   }
 
   public async signIn(signInPayload: LoginDto): Promise<ServiceResponse> {
@@ -57,7 +89,7 @@ export class AuthService {
 
     user.password = undefined;
 
-    const token = this.jwtService.sign({ ...user });
+    const token = this.jwt.sign({ ...user });
 
     return { data: { user, token }, message: 'Login Successful' };
   }
@@ -112,6 +144,11 @@ export class AuthService {
     const user = await this.user.findOne(query);
     if (!user) throw new NotFoundException('user not found');
 
+    const verificationType = isPhoneVerification ? 'Phone' : 'Email';
+
+    const isAlreadyVerified = isPhoneVerification ? user.isPhoneVerified : user.isEmailVerified;
+    if (isAlreadyVerified) throw new BadRequestException(`${verificationType} has already been verified`);
+
     const tokenType = isPhoneVerification ? TOKEN_TYPE.PHONE : TOKEN_TYPE.EMAIL;
 
     await this.sendOTP(tokenType, user);
@@ -120,19 +157,32 @@ export class AuthService {
   }
 
   private async sendOTP(type: TOKEN_TYPE, user: User): Promise<ServiceResponse> {
-    console.log(type);
-    console.log(user);
-
     const token = String(getRandomNumber());
-    console.log(token);
 
-    return null;
+    try {
+      await this.token.deleteMany({ userId: user._id, type });
+
+      const tokenPayload = {
+        userId: user._id,
+        type,
+        token,
+      };
+
+      await this.token.create(tokenPayload);
+
+      type === TOKEN_TYPE.PHONE ? await this.sms.sendVerificationMessage(user, token) : null;
+
+      return { data: null, message: 'OTP sent successfully' };
+    } catch (error) {
+      console.error('Error generating or sending OTP:', error);
+      throw new Error('Failed to send OTP. Please try again later.');
+    }
   }
 
   private async verifyOtp({ token, type, user }): Promise<void> {
     if (user.isVerified === true) throw new BadRequestException('User has already been verified. Please Login');
 
-    const tokenExists = await this.token.findOne({ type, token });
+    const tokenExists = await this.token.findOne({ type, token, userId: user.id });
     if (!tokenExists) throw new NotFoundException('Token not found');
 
     const now = new Date();

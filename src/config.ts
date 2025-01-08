@@ -28,6 +28,11 @@ export const config = {
     cloudName: process.env.CLOUDINARY_CLOUD_NAME,
     apiSecret: process.env.CLOUDINARY_SECRET_KEY,
   },
+  termii: {
+    apiKey: process.env.TERMII_API_KEY,
+    secretKey: process.env.TERMII_SECRET_KEY,
+    senderId: process.env.TERMII_SENDER_ID || 'N-Alert',
+  },
   paystack: {
     baseUrl: process.env.PAYSTACK_BASE_URL,
     publicKey: process.env.PAYSTACK_PUBLIC_KEY,

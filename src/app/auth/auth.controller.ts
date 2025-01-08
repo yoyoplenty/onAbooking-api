@@ -8,7 +8,7 @@ import { PhoneEmailDto } from '@on/utils/dto/shared.dto';
 import { ResponseDTO } from '@on/utils/types';
 
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto, ResetPasswordDto } from './dto/auth.dto';
+import { RegisterDto, LoginDto, ResetPasswordDto, CompleteRegistrationDto } from './dto/auth.dto';
 import { EmailVerificationDto, PhoneVerificationDto } from './dto/otp.dto';
 import { UserTokenDto } from './dto/response.dto';
 
@@ -27,6 +27,22 @@ export class AuthController {
   async register(@Body() registerPayload: RegisterDto, @Res() res: Response): Promise<ResponseDTO> {
     try {
       const response = await this.authService.register(registerPayload);
+
+      return JsonResponse(res, response);
+    } catch (error) {
+      return ErrorResponse(res, error);
+    }
+  }
+
+  @ApiOperation({
+    summary: 'User Completes Registration',
+    description: 'Allows new users complete their registration',
+  })
+  @ApiOkResponse({ description: 'User registration successful', type: ApiResponseDTO })
+  @Post('register/complete')
+  async completeRegistration(@Body() payload: CompleteRegistrationDto, @Res() res: Response): Promise<ResponseDTO> {
+    try {
+      const response = await this.authService.completeRegister(payload);
 
       return JsonResponse(res, response);
     } catch (error) {
