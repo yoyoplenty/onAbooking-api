@@ -45,3 +45,15 @@ export function parseJSONStringValues(data: Record<string, any>): Record<string,
 
   return result;
 }
+
+export const transformStringToObject = ({ value }) => {
+  if (typeof value === 'string') {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value;
+    }
+  }
+
+  return value;
+};

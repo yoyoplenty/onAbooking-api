@@ -14,7 +14,6 @@ import { Roles } from '@on/decorators/roles.decorator';
 import { User } from '@on/decorators/user.decorator';
 import { ROLE } from '@on/enums';
 import { ErrorResponse, JsonResponse } from '@on/handlers/response';
-import { requestFilter } from '@on/helpers/request-filter';
 import { ApiResponseDTO } from '@on/utils/dto/response.dto';
 import { ResponseDTO } from '@on/utils/types';
 
@@ -25,6 +24,7 @@ import { UserDocument } from '../user/model/user.model';
 import { CreatePropertyDto } from './dto/create.dto';
 import { QueryPropertyDto } from './dto/query.dto';
 import { UpdatePropertyDto } from './dto/update.dto';
+import { propertyRequestFilter } from './helper/request-filter';
 import { Property } from './model/property.model';
 import { PropertyService } from './property.service';
 
@@ -69,9 +69,7 @@ export class PropertyController {
     try {
       const { offset, limit } = query;
 
-      const filter = requestFilter(query);
-
-      console.log(offset, limit);
+      const filter = propertyRequestFilter(query);
 
       const response = await this.propertyService.find(filter, offset, limit);
 

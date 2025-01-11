@@ -4,21 +4,10 @@ import { IsNotEmpty, IsString, IsOptional, IsEnum, ValidateNested } from 'class-
 import { ObjectId } from 'mongodb';
 
 import { PROPERTY_STATUS, PROPERTY_TYPE } from '@on/enums';
+import { transformStringToObject } from '@on/helpers';
 import { PropertyUploadDto } from '@on/utils/dto/property-upload.dto';
 
 import { FeaturesDto, LocationDto, PriceDto } from './extras.dto';
-
-const transformStringToObject = ({ value }) => {
-  if (typeof value === 'string') {
-    try {
-      return JSON.parse(value);
-    } catch {
-      return value;
-    }
-  }
-
-  return value;
-};
 
 export class CreatePropertyDto extends PropertyUploadDto {
   @ApiProperty({ description: 'Name of the property', example: 'Cozy Cottage' })
