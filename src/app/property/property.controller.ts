@@ -46,8 +46,8 @@ export class PropertyController {
   @FormDataRequest()
   @Post()
   async createProperty(
-    @User() user: UserDocument,
     @Body() createPropertyPayload: CreatePropertyDto,
+    @User() user: UserDocument,
     @Res() res: Response,
   ): Promise<ResponseDTO> {
     try {

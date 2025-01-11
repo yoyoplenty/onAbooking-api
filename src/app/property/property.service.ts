@@ -21,7 +21,7 @@ export class PropertyService {
     private readonly propertyImage: PropertyImageRepository,
   ) {}
 
-  async create(user: UserDocument, payload: CreatePropertyDto): Promise<ServiceResponse> {
+  public async create(user: UserDocument, payload: CreatePropertyDto): Promise<ServiceResponse> {
     const { files = null, name } = payload;
 
     const images = files && Array.isArray(files) ? [...files] : [files];
@@ -50,9 +50,7 @@ export class PropertyService {
     return { data: property, message: `Properties successfully created` };
   }
 
-  async find(filter: QueryPropertyDto, skip?, limit?): Promise<ServiceResponse> {
-    console.log(filter);
-
+  public async find(filter: QueryPropertyDto, skip?: number, limit?: number): Promise<ServiceResponse> {
     const data = await this.property.aggregateAndCount(
       [
         { $match: filter },
@@ -64,6 +62,28 @@ export class PropertyService {
             as: 'images',
           },
         },
+        {
+          $lookup: {
+            from: 'reviews',
+            localField: '_id',
+            foreignField: 'propertyId',
+            as: 'reviews',
+          },
+        },
+        {
+          $addFields: {
+            averageRating: {
+              $cond: {
+                if: { $gt: [{ $size: '$reviews' }, 0] },
+                then: { $avg: '$reviews.rating' },
+                else: 0,
+              },
+            },
+          },
+        },
+        { $sort: { averageRating: -1 } },
+        { $skip: skip || 0 },
+        { $limit: limit || 10 },
       ],
       { aggregate: { skip, limit } },
     );
@@ -71,7 +91,7 @@ export class PropertyService {
     return { data, message: `Properties successfully fetched` };
   }
 
-  async update(id: ObjectId | string, updatePropertyPayload: UpdatePropertyDto): Promise<ServiceResponse> {
+  public async update(id: ObjectId | string, updatePropertyPayload: UpdatePropertyDto): Promise<ServiceResponse> {
     const { files = null } = updatePropertyPayload;
 
     const images = files && Array.isArray(files) ? [...files] : [files];
@@ -95,7 +115,7 @@ export class PropertyService {
     return { data: property, message: `Properties successfully updated` };
   }
 
-  async delete(id: ObjectId | string): Promise<ServiceResponse> {
+  public async delete(id: ObjectId | string): Promise<ServiceResponse> {
     const property = await this.property.findById(new ObjectId(id));
     if (!property) throw new NotFoundException('property not found');
 
