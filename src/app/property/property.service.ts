@@ -6,6 +6,7 @@ import { ServiceResponse } from '@on/utils/types';
 
 import { PropertyImageRepository } from '../property-image/repository/property-image.repository';
 
+import { UserDocument } from './../user/model/user.model';
 import { CreatePropertyDto } from './dto/create.dto';
 import { QueryPropertyDto } from './dto/query.dto';
 import { UpdatePropertyDto } from './dto/update.dto';
@@ -19,13 +20,13 @@ export class PropertyService {
     private readonly propertyImage: PropertyImageRepository,
   ) {}
 
-  async create(createPropertyPayload: CreatePropertyDto): Promise<ServiceResponse> {
+  async create(user: UserDocument, createPropertyPayload: CreatePropertyDto): Promise<ServiceResponse> {
     const { files = null, name } = createPropertyPayload;
 
     const images = files && Array.isArray(files) ? [...files] : [files];
 
-    const propertyExist = await this.property.findOne({ name });
-    if (propertyExist) throw new ConflictException('property with name exists');
+    const propertyExist = await this.property.findOne({ name, hostId: user._id });
+    if (propertyExist) throw new ConflictException('property with name exists for host');
 
     const imageUrls = await this.cloudinary.uploadImages(images);
 

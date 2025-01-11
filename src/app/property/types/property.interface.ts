@@ -24,8 +24,33 @@ export interface IAccessibility {
   bathrooms: string[];
 }
 
+export interface IDetails {
+  bathroom: number;
+  bedroom: number;
+  kitchens: number;
+  tv: number;
+}
+
+export interface IOccupancy {
+  adults: number;
+  teenagers: number;
+  kids: number;
+  toddlers: number;
+  infants: number;
+  pets: number;
+}
+
+export interface IAmenities {
+  wifi: boolean;
+  pool: boolean;
+  parking: boolean;
+  extra: Record<string, boolean>[];
+}
+
 export interface IFeatures {
-  amenities: string[];
+  amenities: IAmenities;
+  details: IDetails;
+  occupancy: IOccupancy;
   accessibility: IAccessibility;
   bookingOptions: string[];
 }
@@ -44,6 +69,7 @@ export interface IProperty extends IBaseType {
   location: ILocation;
   features: IFeatures;
   price: IPrice;
+  isAdmin: boolean;
   status: PROPERTY_STATUS;
   images: PropertyImage[];
 }

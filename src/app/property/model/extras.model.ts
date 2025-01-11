@@ -1,7 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IAccessibility, ICoordinates, IFeatures, ILocation, IPrice } from '../types/property.interface';
+import {
+  IAccessibility,
+  IAmenities,
+  ICoordinates,
+  IDetails,
+  IFeatures,
+  ILocation,
+  IOccupancy,
+  IPrice,
+} from '../types/property.interface';
 
 @Schema()
 export class Location implements ILocation {
@@ -33,10 +42,89 @@ export class Location implements ILocation {
 export const LocationSchema = SchemaFactory.createForClass(Location);
 
 @Schema()
+export class Amenities implements IAmenities {
+  @ApiProperty()
+  @Prop({ type: Boolean, default: false })
+  wifi: boolean;
+
+  @ApiProperty()
+  @Prop({ type: Boolean, default: false })
+  pool: boolean;
+
+  @ApiProperty()
+  @Prop({ type: Boolean, default: false })
+  parking: boolean;
+
+  @ApiProperty({ type: [Object], description: 'List of extra amenities with their statuses' })
+  @Prop({ type: [{ name: String, value: Boolean }], default: [] })
+  extra: Record<string, boolean>[];
+}
+
+export const AmenitiesSchema = SchemaFactory.createForClass(Amenities);
+
+@Schema()
+export class Details implements IDetails {
+  @ApiProperty()
+  @Prop({ type: Number })
+  bathroom: number;
+
+  @ApiProperty()
+  @Prop({ type: Number })
+  bedroom: number;
+
+  @ApiProperty()
+  @Prop({ type: Number })
+  kitchens: number;
+
+  @ApiProperty()
+  @Prop({ type: Number })
+  tv: number;
+}
+
+export const DetailsSchema = SchemaFactory.createForClass(Details);
+
+@Schema()
+export class Occupancy implements IOccupancy {
+  @ApiProperty()
+  @Prop({ type: Number })
+  adults: number;
+
+  @ApiProperty()
+  @Prop({ type: Number })
+  teenagers: number;
+
+  @ApiProperty()
+  @Prop({ type: Number })
+  kids: number;
+
+  @ApiProperty()
+  @Prop({ type: Number })
+  toddlers: number;
+
+  @ApiProperty()
+  @Prop({ type: Number })
+  infants: number;
+
+  @ApiProperty()
+  @Prop({ type: Number })
+  pets: number;
+}
+
+export const OccupancySchema = SchemaFactory.createForClass(Occupancy);
+
+@Schema()
 export class Features implements IFeatures {
   @ApiProperty()
-  @Prop({ type: [String], default: [] })
-  amenities: string[];
+  @Prop({ type: AmenitiesSchema })
+  amenities: IAmenities;
+
+  @ApiProperty()
+  @Prop({ type: DetailsSchema })
+  details: IDetails;
+
+  @ApiProperty()
+  @Prop({ type: OccupancySchema })
+  occupancy: IOccupancy;
 
   @ApiProperty()
   @Prop({

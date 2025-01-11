@@ -11,6 +11,8 @@ import { Response } from 'express';
 import { FormDataRequest } from 'nestjs-form-data';
 
 import { Roles } from '@on/decorators/roles.decorator';
+import { User } from '@on/decorators/user.decorator';
+import { ROLE } from '@on/enums';
 import { ErrorResponse, JsonResponse } from '@on/handlers/response';
 import { requestFilter } from '@on/helpers/request-filter';
 import { ApiResponseDTO } from '@on/utils/dto/response.dto';
@@ -18,6 +20,7 @@ import { ResponseDTO } from '@on/utils/types';
 
 import { JwtAuthGuard } from '../auth/guard/auth.guard';
 import { RoleGuard } from '../auth/guard/role.guard';
+import { UserDocument } from '../user/model/user.model';
 
 import { CreatePropertyDto } from './dto/create.dto';
 import { QueryPropertyDto } from './dto/query.dto';
@@ -33,18 +36,22 @@ export class PropertyController {
 
   @ApiBearerAuth()
   @ApiOperation({
-    summary: 'Admin creates property',
-    description: 'Allows admin create property',
+    summary: 'Host a property',
+    description: 'Allows host/admin create property',
   })
   @ApiOkResponse({ description: 'Property creation successful ', type: ApiResponseDTO })
-  @Roles('admin')
+  @Roles(ROLE.GUEST, ROLE.ADMIN)
   @UseGuards(JwtAuthGuard, RoleGuard)
   @ApiConsumes('multipart/form-data')
   @FormDataRequest()
   @Post()
-  async createProperty(@Body() createPropertyPayload: CreatePropertyDto, @Res() res: Response): Promise<ResponseDTO> {
+  async createProperty(
+    @User() user: UserDocument,
+    @Body() createPropertyPayload: CreatePropertyDto,
+    @Res() res: Response,
+  ): Promise<ResponseDTO> {
     try {
-      const response = await this.propertyService.create(createPropertyPayload);
+      const response = await this.propertyService.create(user, createPropertyPayload);
 
       return JsonResponse(res, response);
     } catch (error) {

@@ -47,6 +47,10 @@ export class Property implements IProperty {
   status: PROPERTY_STATUS;
 
   @ApiProperty()
+  @Prop({ type: Boolean, default: false })
+  isAdmin: boolean;
+
+  @ApiProperty()
   images: PropertyImage[];
 }
 
