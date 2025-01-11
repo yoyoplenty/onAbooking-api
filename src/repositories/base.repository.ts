@@ -99,6 +99,10 @@ export class BaseRepository<T> {
     return await this.repository.findOneAndUpdate(query, update, { new: true }).exec();
   }
 
+  async upsert(query: GenericRecord, update: GenericRecord): Promise<void> {
+    await this.repository.updateOne(query, update, { upsert: true }).exec();
+  }
+
   async updateById(id: string | ObjectId, update: GenericRecord, options?: GenericRecord): Promise<T | any> {
     const objectId = new ObjectId(String(id));
 

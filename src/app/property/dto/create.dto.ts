@@ -1,5 +1,5 @@
 import { ApiHideProperty, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { IsNotEmpty, IsString, IsOptional, IsEnum, ValidateNested } from 'class-validator';
 import { ObjectId } from 'mongodb';
 
@@ -7,6 +7,18 @@ import { PROPERTY_STATUS, PROPERTY_TYPE } from '@on/enums';
 import { PropertyUploadDto } from '@on/utils/dto/property-upload.dto';
 
 import { FeaturesDto, LocationDto, PriceDto } from './extras.dto';
+
+const transformStringToObject = ({ value }) => {
+  if (typeof value === 'string') {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value;
+    }
+  }
+
+  return value;
+};
 
 export class CreatePropertyDto extends PropertyUploadDto {
   @ApiProperty({ description: 'Name of the property', example: 'Cozy Cottage' })
@@ -26,16 +38,19 @@ export class CreatePropertyDto extends PropertyUploadDto {
 
   @ApiProperty({ description: 'Location details of the property' })
   @ValidateNested()
+  @Transform(transformStringToObject)
   @Type(() => LocationDto)
   location: LocationDto;
 
   @ApiProperty({ description: 'Property features' })
   @ValidateNested()
+  @Transform(transformStringToObject)
   @Type(() => FeaturesDto)
   features: FeaturesDto;
 
   @ApiProperty({ description: 'Price details of the property' })
   @ValidateNested()
+  @Transform(transformStringToObject)
   @Type(() => PriceDto)
   price: PriceDto;
 

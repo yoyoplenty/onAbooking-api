@@ -12,7 +12,7 @@ import {
   IPrice,
 } from '../types/property.interface';
 
-@Schema()
+@Schema({ _id: false })
 export class Location implements ILocation {
   @ApiProperty()
   @Prop({ type: String, required: true })
@@ -41,7 +41,7 @@ export class Location implements ILocation {
 
 export const LocationSchema = SchemaFactory.createForClass(Location);
 
-@Schema()
+@Schema({ _id: false })
 export class Amenities implements IAmenities {
   @ApiProperty()
   @Prop({ type: Boolean, default: false })
@@ -56,13 +56,13 @@ export class Amenities implements IAmenities {
   parking: boolean;
 
   @ApiProperty({ type: [Object], description: 'List of extra amenities with their statuses' })
-  @Prop({ type: [{ name: String, value: Boolean }], default: [] })
+  @Prop({ type: [Object], default: [] })
   extra: Record<string, boolean>[];
 }
 
 export const AmenitiesSchema = SchemaFactory.createForClass(Amenities);
 
-@Schema()
+@Schema({ _id: false })
 export class Details implements IDetails {
   @ApiProperty()
   @Prop({ type: Number })
@@ -83,7 +83,7 @@ export class Details implements IDetails {
 
 export const DetailsSchema = SchemaFactory.createForClass(Details);
 
-@Schema()
+@Schema({ _id: false })
 export class Occupancy implements IOccupancy {
   @ApiProperty()
   @Prop({ type: Number })
@@ -112,7 +112,7 @@ export class Occupancy implements IOccupancy {
 
 export const OccupancySchema = SchemaFactory.createForClass(Occupancy);
 
-@Schema()
+@Schema({ _id: false })
 export class Features implements IFeatures {
   @ApiProperty()
   @Prop({ type: AmenitiesSchema })
@@ -144,7 +144,7 @@ export class Features implements IFeatures {
 
 export const FeaturesSchema = SchemaFactory.createForClass(Features);
 
-@Schema()
+@Schema({ _id: false })
 export class Price implements IPrice {
   @ApiProperty()
   @Prop({ type: Number, required: true })

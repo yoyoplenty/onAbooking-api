@@ -10,6 +10,7 @@ import { ServiceResponse } from '@on/utils/types';
 
 import { User } from '../user/model/user.model';
 import { UserRepository } from '../user/repository/user.repository';
+import { WalletRepository } from '../user/repository/wallet.repository';
 import { TokenRepository } from '../user/repository/wallet.repository copy';
 
 import { CompleteRegistrationDto, LoginDto, RegisterDto, ResetPasswordDto } from './dto/auth.dto';
@@ -18,10 +19,11 @@ import { EmailVerificationDto, PhoneVerificationDto } from './dto/otp.dto';
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly user: UserRepository,
-    private readonly token: TokenRepository,
     private readonly jwt: JwtService,
     private readonly sms: smsService,
+    private readonly user: UserRepository,
+    private readonly token: TokenRepository,
+    private readonly wallet: WalletRepository,
   ) {}
 
   public async register(registerPayload: RegisterDto): Promise<ServiceResponse> {
@@ -55,7 +57,9 @@ export class AuthService {
     const { countryCode, phoneNumber, password } = payload;
 
     const user = await this.user.findOne({ countryCode, phoneNumber });
+
     if (!user) throw new NotFoundException('user not found');
+    if (user.role === ROLE.HOST) await this.wallet.upsert({ userId: user._id }, {});
 
     if (!user.isPhoneVerified) {
       await this.sendOTP(TOKEN_TYPE.PHONE, user);
@@ -89,7 +93,7 @@ export class AuthService {
 
     user.password = undefined;
 
-    const token = this.jwt.sign({ ...user });
+    const token = this.jwt.sign(user.toJSON());
 
     return { data: { user, token }, message: 'Login Successful' };
   }

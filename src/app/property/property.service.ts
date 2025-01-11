@@ -1,6 +1,7 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { ObjectId } from 'mongodb';
 
+import { parseJSONStringValues } from '@on/helpers';
 import { CloudinaryService } from '@on/services/cloudinary/service';
 import { ServiceResponse } from '@on/utils/types';
 
@@ -20,17 +21,24 @@ export class PropertyService {
     private readonly propertyImage: PropertyImageRepository,
   ) {}
 
-  async create(user: UserDocument, createPropertyPayload: CreatePropertyDto): Promise<ServiceResponse> {
-    const { files = null, name } = createPropertyPayload;
+  async create(user: UserDocument, payload: CreatePropertyDto): Promise<ServiceResponse> {
+    const { files = null, name } = payload;
 
     const images = files && Array.isArray(files) ? [...files] : [files];
 
     const propertyExist = await this.property.findOne({ name, hostId: user._id });
     if (propertyExist) throw new ConflictException('property with name exists for host');
 
+    const parsedPayload = parseJSONStringValues(payload);
+
     const imageUrls = await this.cloudinary.uploadImages(images);
 
-    const property = await this.property.create(createPropertyPayload);
+    const propertyPayload = {
+      ...parsedPayload,
+      hostId: user._id,
+    };
+
+    const property = await this.property.create(propertyPayload);
 
     const propertyImageDocuments = imageUrls.map((imageUrl) => ({
       propertyId: property._id,

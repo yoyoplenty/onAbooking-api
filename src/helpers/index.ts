@@ -21,3 +21,27 @@ export const isAdmin = (user) => {
   if (user.role === 'admin' || user.role === 'super-admin') return true;
   else return false;
 };
+
+export function parseJSONStringValues(data: Record<string, any>): Record<string, any> {
+  const isJSON = (str: string): boolean => {
+    try {
+      const parsed = JSON.parse(str);
+
+      return (typeof parsed === 'object' && parsed !== null) || Array.isArray(parsed);
+    } catch {
+      return false;
+    }
+  };
+
+  const result: Record<string, any> = {};
+
+  for (const [key, value] of Object.entries(data)) {
+    if (typeof value === 'string' && isJSON(value)) {
+      result[key] = JSON.parse(value);
+    } else {
+      result[key] = value;
+    }
+  }
+
+  return result;
+}

@@ -40,7 +40,7 @@ export class PropertyController {
     description: 'Allows host/admin create property',
   })
   @ApiOkResponse({ description: 'Property creation successful ', type: ApiResponseDTO })
-  @Roles(ROLE.GUEST, ROLE.ADMIN)
+  @Roles(ROLE.HOST, ROLE.ADMIN)
   @UseGuards(JwtAuthGuard, RoleGuard)
   @ApiConsumes('multipart/form-data')
   @FormDataRequest()
