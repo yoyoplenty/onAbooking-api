@@ -5,8 +5,6 @@ import { QueryPropertyDto } from '../dto/query.dto';
 export const propertyRequestFilter = (filter: QueryPropertyDto) => {
   const query: any = {};
 
-  console.log(filter);
-
   if (filter.name) query.name = { $regex: filter.name, $options: 'i' };
 
   if (filter.hostId) query.hostId = new ObjectId(filter.hostId);
@@ -42,9 +40,13 @@ export const propertyRequestFilter = (filter: QueryPropertyDto) => {
   if (filter.minKitchens !== undefined) query['features.details.kitchens'] = { $gte: filter.minKitchens };
 
   if (filter.amenities) {
-    filter.amenities.forEach((amenity) => {
-      query[`features.amenities.${amenity}`] = true;
-    });
+    if (Array.isArray(filter.amenities)) {
+      filter.amenities.forEach((amenity) => {
+        query[`features.amenities.${amenity}`] = true;
+      });
+    } else {
+      query[`features.amenities.${filter.amenities}`] = true;
+    }
   }
 
   if (filter.minPrice !== undefined || filter.maxPrice !== undefined) {
@@ -53,10 +55,10 @@ export const propertyRequestFilter = (filter: QueryPropertyDto) => {
     if (filter.maxPrice !== undefined) query['price.amount'].$lte = filter.maxPrice;
   }
 
-  if (filter.adults !== undefined) query['features.occupancy.adults'] = { $gte: filter.adults };
-  if (filter.teenagers !== undefined) query['features.occupancy.teenagers'] = { $gte: filter.teenagers };
-  if (filter.kids !== undefined) query['features.occupancy.kids'] = { $gte: filter.kids };
-  if (filter.toddlers !== undefined) query['features.occupancy.toddlers'] = { $gte: filter.toddlers };
+  if (filter.adults !== undefined) query['features.occupancy.adults'] = { $gte: Number(filter.adults) };
+  if (filter.teenagers !== undefined) query['features.occupancy.teenagers'] = { $gte: Number(filter.teenagers) };
+  if (filter.kids !== undefined) query['features.occupancy.kids'] = { $gte: Number(filter.kids) };
+  if (filter.toddlers !== undefined) query['features.occupancy.toddlers'] = { $gte: Number(filter.toddlers) };
   if (filter.infants !== undefined) query['features.occupancy.infants'] = { $gte: filter.infants };
   if (filter.pets !== undefined) query['features.occupancy.pets'] = { $gte: filter.pets };
 
