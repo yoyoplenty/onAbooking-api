@@ -5,6 +5,9 @@ import { IBaseType } from '@on/utils/types';
 export interface IReview extends IBaseType {
   propertyId: ObjectId;
   guestId: ObjectId;
-  rating: number;
+  cleanliness: number;
+  responsiveness: number;
+  comfort: number;
+  locationAccuracy: number;
   comment: string;
 }

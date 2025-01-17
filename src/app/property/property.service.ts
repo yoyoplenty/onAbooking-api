@@ -11,6 +11,7 @@ import { UserDocument } from './../user/model/user.model';
 import { CreatePropertyDto } from './dto/create.dto';
 import { QueryPropertyDto } from './dto/query.dto';
 import { UpdatePropertyDto } from './dto/update.dto';
+import { averageRatingAggregation } from './helper/aggregation';
 import { PropertyRepository } from './repository/property.repository';
 
 @Injectable()
@@ -54,33 +55,9 @@ export class PropertyService {
     const data = await this.property.aggregateAndCount(
       [
         { $match: filter },
-        {
-          $lookup: {
-            from: 'propertyimages',
-            localField: '_id',
-            foreignField: 'propertyId',
-            as: 'images',
-          },
-        },
-        {
-          $lookup: {
-            from: 'reviews',
-            localField: '_id',
-            foreignField: 'propertyId',
-            as: 'reviews',
-          },
-        },
-        {
-          $addFields: {
-            averageRating: {
-              $cond: {
-                if: { $gt: [{ $size: '$reviews' }, 0] },
-                then: { $avg: '$reviews.rating' },
-                else: 0,
-              },
-            },
-          },
-        },
+        { $lookup: { from: 'propertyimages', localField: '_id', foreignField: 'propertyId', as: 'images' } },
+        { $lookup: { from: 'reviews', localField: '_id', foreignField: 'propertyId', as: 'reviews' } },
+        { $addFields: { averageRating: averageRatingAggregation() } },
         { $sort: { averageRating: -1 } },
         { $skip: skip || 0 },
         { $limit: limit || 10 },
