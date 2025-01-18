@@ -27,22 +27,33 @@ export class AuthService {
   ) {}
 
   public async register(registerPayload: RegisterDto): Promise<ServiceResponse> {
-    const { country, countryCode, phoneNumber, role = ROLE.GUEST } = registerPayload;
+    const { country, countryCode, phoneNumber, email, role = ROLE.GUEST } = registerPayload;
 
-    const userExists = await this.user.findOne({ countryCode, phoneNumber });
+    const userExists = phoneNumber
+      ? await this.user.findOne({ countryCode, phoneNumber })
+      : email
+        ? await this.user.findOne({ email })
+        : null;
+
     if (userExists) {
-      if (!userExists.isPhoneVerified) {
+      if (phoneNumber && !userExists.isPhoneVerified) {
         await this.sendOTP(TOKEN_TYPE.PHONE, userExists);
         throw new ConflictException('User exists, verification OTP sent successfully.');
       }
-      throw new ConflictException('user already exists');
+
+      if (email && !userExists.isEmailVerified) {
+        await this.sendOTP(TOKEN_TYPE.EMAIL, userExists);
+        throw new ConflictException('User exists, verification email sent successfully.');
+      }
+
+      throw new ConflictException('User already exists');
     }
 
     const userPayload = { country, role, ...registerPayload };
 
     const user = await this.user.create(userPayload);
 
-    await this.sendOTP(TOKEN_TYPE.PHONE, user);
+    phoneNumber ? await this.sendOTP(TOKEN_TYPE.PHONE, user) : await this.sendOTP(TOKEN_TYPE.EMAIL, user);
 
     return { data: user, message: 'User registered successfully. OTP sent for verification.' };
   }

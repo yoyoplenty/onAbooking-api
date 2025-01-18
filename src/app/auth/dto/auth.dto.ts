@@ -3,11 +3,11 @@ import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 import { UserDto } from '@on/app/user/dto/user.dto';
 import { ROLE } from '@on/enums';
-import { PhoneDto, PhoneEmailDto } from '@on/utils/dto/shared.dto';
+import { PhoneEmailDto } from '@on/utils/dto/shared.dto';
 
 import { ILogin, IRegister } from '../types/auth.interface';
 
-export class RegisterDto extends PhoneDto implements IRegister {
+export class RegisterDto extends PhoneEmailDto implements IRegister {
   @ApiProperty({ description: 'User country' })
   @IsString()
   @IsNotEmpty()
