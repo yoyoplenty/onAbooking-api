@@ -43,4 +43,9 @@ export const config = {
     baseUrl: process.env.SENDCHAMP_BASE_URL,
     apiKey: process.env.SENDCHAMP_API_KEY,
   },
+  brevo: {
+    apiKey: process.env.BREVO_API_KEY,
+    sendEmail: process.env.BREVO_SENDER_EMAIL || 'admin.easyflip.work',
+    replyEmail: process.env.BREVO_REPLY_EMAIL || 'noreply.easyflip.work',
+  },
 };

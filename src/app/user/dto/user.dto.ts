@@ -24,6 +24,16 @@ export class UserDto {
   @IsEmail()
   email?: string;
 
+  @ApiProperty({ description: 'Country code in the format +XXX', example: '234' })
+  @IsOptional()
+  @IsString()
+  countryCode: string;
+
+  @ApiProperty({ description: 'Phone number without country code', example: '7012345678' })
+  @IsOptional()
+  @IsString()
+  phoneNumber: string;
+
   @ApiProperty({ description: 'Password of the user', required: false })
   @IsOptional()
   @IsString()
@@ -51,12 +61,6 @@ export class UserDto {
 
   @ApiHideProperty()
   country: string;
-
-  @ApiHideProperty()
-  countryCode: string;
-
-  @ApiHideProperty()
-  phoneNumber: string;
 
   @ApiHideProperty()
   lastLogin?: string;

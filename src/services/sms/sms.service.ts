@@ -6,7 +6,7 @@ import { sendMessage } from './termii/api';
 import { MessageResponse } from './termii/interface';
 
 @Injectable()
-export class smsService {
+export class SmsService {
   public async sendVerificationMessage(user: User, token: string, message?: string): Promise<MessageResponse> {
     const { countryCode, phoneNumber } = user;
 
