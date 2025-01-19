@@ -3,7 +3,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import mongoose, { HydratedDocument } from 'mongoose';
 
 import { Property } from '@on/app/property/model/property.model';
-import { User } from '@on/app/user/model/user.model';
+import { User } from '@on/app/user/model/user/user.model';
 
 import { IBooking } from '../types/booking.interface';
 

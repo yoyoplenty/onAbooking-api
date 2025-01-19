@@ -2,20 +2,20 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsMongoId, IsNumber, IsString, Max, Min } from 'class-validator';
 import { ObjectId } from 'mongodb';
 
-import { IReview } from '../types/review.interface';
+import { IHostReview } from '../../types/host-review.interface';
 
-export class CreateReviewDto implements Omit<IReview, 'guestId'> {
-  @ApiProperty({ description: 'ID of the property being reviewed' })
+export class CreateHostReviewDto implements Omit<IHostReview, 'guestId' | 'hostComment'> {
+  @ApiProperty({ description: 'ID of the host being reviewed' })
   @IsNotEmpty()
   @IsMongoId()
-  propertyId: ObjectId;
+  hostId: ObjectId;
 
   @ApiProperty({ example: 5, description: 'Rating for cleanliness (1-5)' })
   @IsNotEmpty()
   @IsNumber()
   @Min(1)
   @Max(5)
-  cleanliness: number;
+  professionalism: number;
 
   @ApiProperty({ example: 5, description: 'Rating for responsiveness (1-5)' })
   @IsNotEmpty()
@@ -29,20 +29,10 @@ export class CreateReviewDto implements Omit<IReview, 'guestId'> {
   @IsNumber()
   @Min(1)
   @Max(5)
-  comfort: number;
-
-  @ApiProperty({ example: 5, description: 'Rating for location accuracy (1-5)' })
-  @IsNotEmpty()
-  @IsNumber()
-  @Min(1)
-  @Max(5)
-  locationAccuracy: number;
+  hospitality: number;
 
   @ApiProperty({ description: 'Review comment by the guest' })
   @IsNotEmpty()
   @IsString()
   comment: string;
-
-  @ApiProperty({ description: 'Guest ID', required: false })
-  guestId: ObjectId;
 }

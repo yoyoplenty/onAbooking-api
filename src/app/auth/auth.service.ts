@@ -8,10 +8,9 @@ import { smsService } from '@on/services/sms/sms.service';
 import { PhoneEmailDto } from '@on/utils/dto/shared.dto';
 import { ServiceResponse } from '@on/utils/types';
 
-import { User } from '../user/model/user.model';
+import { User } from '../user/model/user/user.model';
+import { TokenRepository } from '../user/repository/token.repository';
 import { UserRepository } from '../user/repository/user.repository';
-import { WalletRepository } from '../user/repository/wallet.repository';
-import { TokenRepository } from '../user/repository/wallet.repository copy';
 
 import { CompleteRegistrationDto, LoginDto, RegisterDto, ResetPasswordDto } from './dto/auth.dto';
 import { EmailVerificationDto, PhoneVerificationDto } from './dto/otp.dto';
@@ -23,29 +22,15 @@ export class AuthService {
     private readonly sms: smsService,
     private readonly user: UserRepository,
     private readonly token: TokenRepository,
-    private readonly wallet: WalletRepository,
   ) {}
 
   public async register(registerPayload: RegisterDto): Promise<ServiceResponse> {
     const { country, countryCode, phoneNumber, email, role = ROLE.GUEST } = registerPayload;
 
-    const userExists = phoneNumber
-      ? await this.user.findOne({ countryCode, phoneNumber })
-      : email
-        ? await this.user.findOne({ email })
-        : null;
+    const userExists = await this.findUser(phoneNumber, email, countryCode);
 
     if (userExists) {
-      if (phoneNumber && !userExists.isPhoneVerified) {
-        await this.sendOTP(TOKEN_TYPE.PHONE, userExists);
-        throw new ConflictException('User exists, verification OTP sent successfully.');
-      }
-
-      if (email && !userExists.isEmailVerified) {
-        await this.sendOTP(TOKEN_TYPE.EMAIL, userExists);
-        throw new ConflictException('User exists, verification email sent successfully.');
-      }
-
+      await this.verifyUser(userExists, phoneNumber, email);
       throw new ConflictException('User already exists');
     }
 
@@ -65,17 +50,14 @@ export class AuthService {
   }
 
   public async completeRegister(payload: CompleteRegistrationDto): Promise<ServiceResponse> {
-    const { countryCode, phoneNumber, password } = payload;
+    const { countryCode, phoneNumber, email, password } = payload;
 
-    const user = await this.user.findOne({ countryCode, phoneNumber });
+    const user = await this.findUser(phoneNumber, email, countryCode);
+    if (!user) throw new NotFoundException('User not found');
 
-    if (!user) throw new NotFoundException('user not found');
-    if (user.role === ROLE.HOST) await this.wallet.upsert({ userId: user._id }, {});
+    // if (user.role === ROLE.HOST) await this.wallet.upsert({ userId: user._id }, {});
 
-    if (!user.isPhoneVerified) {
-      await this.sendOTP(TOKEN_TYPE.PHONE, user);
-      throw new NotFoundException('User phone not verified, Verification OTP sent successfully.');
-    }
+    await this.verifyUser(user, phoneNumber, email);
 
     const updatePayload = {
       ...payload,
@@ -85,9 +67,7 @@ export class AuthService {
 
     await this.user.updateById(user._id, updatePayload);
 
-    await this.sendOTP(TOKEN_TYPE.EMAIL, user);
-
-    return { data: user, message: 'Registration completed successfully. OTP sent to email for verification.' };
+    return { data: user, message: 'Registration completed successfully. OTP sent for verification.' };
   }
 
   public async signIn(signInPayload: LoginDto): Promise<ServiceResponse> {
@@ -148,6 +128,26 @@ export class AuthService {
     await this.user.updateById(user._id, { password });
 
     return { data: null, message: 'Password has been reset successfully' };
+  }
+
+  private async findUser(phoneNumber?: string, email?: string, countryCode?: string): Promise<User> {
+    return phoneNumber
+      ? await this.user.findOne({ countryCode, phoneNumber })
+      : email
+        ? await this.user.findOne({ email })
+        : null;
+  }
+
+  private async verifyUser(user: User, phoneNumber?: string, email?: string): Promise<void> {
+    if (phoneNumber && !user.isPhoneVerified) {
+      await this.sendOTP(TOKEN_TYPE.PHONE, user);
+      throw new ConflictException('User phone not verified. Verification OTP sent successfully.');
+    }
+
+    if (email && !user.isEmailVerified) {
+      await this.sendOTP(TOKEN_TYPE.EMAIL, user);
+      throw new ConflictException('User email not verified. Verification email sent successfully.');
+    }
   }
 
   private async sendVerification(payload: PhoneEmailDto): Promise<ServiceResponse> {

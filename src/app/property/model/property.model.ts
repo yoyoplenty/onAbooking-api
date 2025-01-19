@@ -19,7 +19,7 @@ export class Property implements IProperty {
   name: string;
 
   @ApiProperty({ type: String })
-  @Prop({ type: Types.ObjectId, required: true, ref: 'User' })
+  @Prop({ type: Types.ObjectId, required: true, ref: 'Host' })
   hostId: ObjectId;
 
   @ApiProperty()

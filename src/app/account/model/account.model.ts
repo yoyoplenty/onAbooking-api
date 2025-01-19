@@ -10,8 +10,8 @@ export type AccountDocument = HydratedDocument<Account>;
 @Schema({ collection: 'reviews', versionKey: false, timestamps: true })
 export class Account implements IAccount {
   @ApiProperty()
-  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  userId: ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Host', required: true })
+  hostId: ObjectId;
 
   @ApiProperty()
   @Prop({ type: String, required: true })

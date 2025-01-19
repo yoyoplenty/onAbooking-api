@@ -1,9 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 
-import { IProfile } from '../types/user.interface';
+import { IProfile } from '../../types/user.interface';
 
-@Schema()
+@Schema({ _id: false })
 export class Profile implements IProfile {
   @ApiProperty()
   @Prop({ type: String, required: true })

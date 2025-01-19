@@ -24,6 +24,11 @@ export enum TRANSACTION_TYPE {
   CREDIT = 'credit',
 }
 
+export enum REVIEW_TYPE {
+  PROPERTY = 'property',
+  HOST = 'host',
+}
+
 export enum PROPERTY_STATUS {
   AVAILABLE = 'available',
   BOOKED = 'booked',

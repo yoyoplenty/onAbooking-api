@@ -19,7 +19,7 @@ import { ResponseDTO } from '@on/utils/types';
 
 import { JwtAuthGuard } from '../auth/guard/auth.guard';
 import { RoleGuard } from '../auth/guard/role.guard';
-import { UserDocument } from '../user/model/user.model';
+import { UserDocument } from '../user/model/user/user.model';
 
 import { CreatePropertyDto } from './dto/create.dto';
 import { QueryPropertyDto } from './dto/query.dto';

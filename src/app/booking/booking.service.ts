@@ -16,7 +16,7 @@ import { PropertyRepository } from '../property/repository/property.repository';
 import { CreateTransactionDto } from '../transaction/dto/create.dto';
 import { TransactionRepository } from '../transaction/repository/transaction.repository';
 
-import { UserDocument } from './../user/model/user.model';
+import { UserDocument } from './../user/model/user/user.model';
 import { BookingDto } from './dto/book.dto';
 import { QueryBookingDto } from './dto/query.dto';
 import { UpdateBookingDto } from './dto/update.dto';

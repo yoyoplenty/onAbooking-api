@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { User } from '@on/app/user/model/user.model';
+import { User } from '@on/app/user/model/user/user.model';
 
 import { sendMessage } from './termii/api';
 import { MessageResponse } from './termii/interface';

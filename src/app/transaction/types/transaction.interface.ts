@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 
 import { Property } from '@on/app/property/model/property.model';
-import { User } from '@on/app/user/model/user.model';
+import { User } from '@on/app/user/model/user/user.model';
 import { TRANSACTION_STATUS, TRANSACTION_TYPE } from '@on/enums';
 import { IBaseType } from '@on/utils/types';
 

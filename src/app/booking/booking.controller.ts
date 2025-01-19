@@ -9,7 +9,7 @@ import { ApiResponseDTO } from '@on/utils/dto/response.dto';
 import { ResponseDTO } from '@on/utils/types';
 
 import { JwtAuthGuard } from '../auth/guard/auth.guard';
-import { UserDocument } from '../user/model/user.model';
+import { UserDocument } from '../user/model/user/user.model';
 
 import { BookingService } from './booking.service';
 import { BookingDto } from './dto/book.dto';

@@ -4,7 +4,7 @@ import { Document, HydratedDocument } from 'mongoose';
 
 import { ROLE, USER_STATUS } from '@on/enums';
 
-import { IUser, IProfile } from '../types/user.interface';
+import { IUser, IProfile } from '../../types/user.interface';
 
 import { ProfileSchema } from './profile.model';
 

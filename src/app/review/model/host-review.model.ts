@@ -3,15 +3,15 @@ import { ApiProperty } from '@nestjs/swagger';
 import { ObjectId } from 'mongodb';
 import { HydratedDocument, Types } from 'mongoose';
 
-import { IReview } from '../types/review.interface';
+import { IHostReview } from '../types/host-review.interface';
 
-export type ReviewDocument = HydratedDocument<Review>;
+export type HostReviewDocument = HydratedDocument<HostReview>;
 
-@Schema({ collection: 'reviews', versionKey: false, timestamps: true })
-export class Review implements IReview {
+@Schema({ collection: 'hostReviews', versionKey: false, timestamps: true })
+export class HostReview implements IHostReview {
   @ApiProperty()
-  @Prop({ type: Types.ObjectId, ref: 'Property', required: true })
-  propertyId: ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Host', required: true })
+  hostId: ObjectId;
 
   @ApiProperty()
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
@@ -19,7 +19,7 @@ export class Review implements IReview {
 
   @ApiProperty({ example: 5, description: 'Rating for cleanliness (1-5)' })
   @Prop({ type: Number, required: true, min: 1, max: 5 })
-  cleanliness: number;
+  professionalism: number;
 
   @ApiProperty({ example: 5, description: 'Rating for responsiveness (1-5)' })
   @Prop({ type: Number, required: true, min: 1, max: 5 })
@@ -27,11 +27,7 @@ export class Review implements IReview {
 
   @ApiProperty({ example: 5, description: 'Rating for comfort (1-5)' })
   @Prop({ type: Number, required: true, min: 1, max: 5 })
-  comfort: number;
-
-  @ApiProperty({ example: 5, description: 'Rating for location accuracy (1-5)' })
-  @Prop({ type: Number, required: true, min: 1, max: 5 })
-  location: number;
+  hospitality: number;
 
   @ApiProperty()
   @Prop({ type: String, required: false })
@@ -42,4 +38,4 @@ export class Review implements IReview {
   hostComment: string;
 }
 
-export const ReviewSchema = SchemaFactory.createForClass(Review);
+export const HostReviewSchema = SchemaFactory.createForClass(HostReview);

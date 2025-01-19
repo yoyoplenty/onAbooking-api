@@ -7,7 +7,7 @@ import { ServiceResponse } from '@on/utils/types';
 
 import { PropertyImageRepository } from '../property-image/repository/property-image.repository';
 
-import { UserDocument } from './../user/model/user.model';
+import { UserDocument } from './../user/model/user/user.model';
 import { CreatePropertyDto } from './dto/create.dto';
 import { QueryPropertyDto } from './dto/query.dto';
 import { UpdatePropertyDto } from './dto/update.dto';

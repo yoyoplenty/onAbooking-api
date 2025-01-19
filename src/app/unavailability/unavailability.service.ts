@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { ServiceResponse } from '@on/utils/types';
 
 import { PropertyRepository } from '../property/repository/property.repository';
-import { UserDocument } from '../user/model/user.model';
+import { UserDocument } from '../user/model/user/user.model';
 
 import { UnavailabilityRepository } from './repository/unavailability.repository';
 

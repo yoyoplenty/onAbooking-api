@@ -3,7 +3,7 @@ import { Model } from 'mongoose';
 
 import { BaseRepository } from '@on/repositories/base.repository';
 
-import { User, UserDocument } from '../model/user.model';
+import { User, UserDocument } from '../model/user/user.model';
 
 export class UserRepository extends BaseRepository<UserDocument> {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {

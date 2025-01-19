@@ -12,7 +12,7 @@ import { JwtAuthGuard } from '../auth/guard/auth.guard';
 import { RoleGuard } from '../auth/guard/role.guard';
 
 import { QueryUserDto } from './dto/query.dto';
-import { User } from './model/user.model';
+import { User } from './model/user/user.model';
 import { UserService } from './user.service';
 
 @ApiTags('User')

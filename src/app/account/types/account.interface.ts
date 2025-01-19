@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import { IBaseType } from '@on/utils/types';
 
 export interface IAccount extends IBaseType {
-  userId: ObjectId;
+  hostId: ObjectId;
   iBan: string;
   bic: string;
   bankName: string;
