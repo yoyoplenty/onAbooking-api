@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AdminModule } from './app/admin/admin.module';
 import { AuthModule } from './app/auth/auth.module';
 import { BookingModule } from './app/booking/booking.module';
+import { FavoriteModule } from './app/favorite/favorite.module';
 import { PropertyModule } from './app/property/property.module';
 import { PropertyImageModule } from './app/property-image/property-image.module';
 import { ReviewModule } from './app/review/review.module';
@@ -25,6 +26,7 @@ import LoggerMiddleware from './middlewares/logger';
     ReviewModule,
     BookingModule,
     PropertyModule,
+    FavoriteModule,
     TransactionModule,
     PropertyImageModule,
     UnavailabilityModule,
