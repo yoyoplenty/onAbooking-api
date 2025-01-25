@@ -18,21 +18,6 @@ export class CloudinaryService {
     });
   }
 
-  private async uploadImageToCloudinary(image: MemoryStoredFile): Promise<UploadApiResponse> {
-    return new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream({ resource_type: 'auto' }, (error, result) => {
-        if (error) {
-          console.error(error);
-          reject(error);
-        } else {
-          resolve(result);
-        }
-      });
-
-      stream.end(image.buffer);
-    });
-  }
-
   async uploadImage(image: MemoryStoredFile): Promise<string> {
     try {
       const result = await this.uploadImageToCloudinary(image);
@@ -58,5 +43,20 @@ export class CloudinaryService {
       console.error(e);
       throw e;
     }
+  }
+
+  private async uploadImageToCloudinary(image: MemoryStoredFile): Promise<UploadApiResponse> {
+    return new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream({ resource_type: 'auto' }, (error, result) => {
+        if (error) {
+          console.error(error);
+          reject(error);
+        } else {
+          resolve(result);
+        }
+      });
+
+      stream.end(image.buffer);
+    });
   }
 }

@@ -3,9 +3,9 @@ import { Transform, Type } from 'class-transformer';
 import { IsNotEmpty, IsString, IsOptional, IsEnum, ValidateNested } from 'class-validator';
 import { ObjectId } from 'mongodb';
 
+import { PropertyUploadDto } from '@on/app/property-image/dto/upload.dto';
 import { PROPERTY_STATUS, PROPERTY_TYPE } from '@on/enums';
 import { transformStringToObject } from '@on/helpers';
-import { PropertyUploadDto } from '@on/utils/dto/property-upload.dto';
 
 import { FeaturesDto, LocationDto, PriceDto } from './extras.dto';
 

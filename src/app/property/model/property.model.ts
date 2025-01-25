@@ -31,15 +31,15 @@ export class Property implements IProperty {
   type: PROPERTY_TYPE;
 
   @ApiProperty()
-  @Prop({ type: LocationSchema, required: true })
+  @Prop({ type: LocationSchema, required: false })
   location: ILocation;
 
   @ApiProperty()
-  @Prop({ type: FeaturesSchema, required: true })
+  @Prop({ type: FeaturesSchema, required: false })
   features: IFeatures;
 
   @ApiProperty()
-  @Prop({ type: PriceSchema, required: true })
+  @Prop({ type: PriceSchema, required: false })
   price: IPrice;
 
   @ApiProperty()

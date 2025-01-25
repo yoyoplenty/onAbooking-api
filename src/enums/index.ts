@@ -29,6 +29,11 @@ export enum REVIEW_TYPE {
   HOST = 'host',
 }
 
+export enum PROPERTY_FILE_TYPE {
+  VIDEO = 'video',
+  IMAGE = 'image',
+}
+
 export enum PROPERTY_STATUS {
   AVAILABLE = 'available',
   BOOKED = 'booked',
