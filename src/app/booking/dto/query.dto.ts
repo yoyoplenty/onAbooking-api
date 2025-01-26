@@ -15,4 +15,7 @@ export class QueryBookingDto extends QueryDto {
 
   @ApiPropertyOptional({ description: 'Booking checkout date' })
   checkOut: Date;
+
+  @ApiPropertyOptional({ description: 'Filter active bookings based on current date', default: false })
+  isActive?: boolean;
 }

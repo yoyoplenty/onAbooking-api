@@ -53,7 +53,7 @@ export class BookingService {
 
     const payload: IBooking = {
       propertyId: new ObjectId(propertyId),
-      userId: user._id,
+      guestId: user._id,
       paymentRef: reference,
       ...bookingPayload,
     };
@@ -109,7 +109,17 @@ export class BookingService {
     return { data: null, message: `Booking verified successfully` };
   }
 
-  async find(filter: QueryBookingDto, skip?, limit?): Promise<ServiceResponse> {
+  async find(query: QueryBookingDto, skip?: number, limit?: number): Promise<ServiceResponse> {
+    const { isActive, ...restFilter } = query;
+
+    const filter: any = { ...restFilter };
+
+    if (isActive) {
+      const now = new Date();
+      filter['checkIn'] = { $lte: now };
+      filter['checkOut'] = { $gte: now };
+    }
+
     const data = await this.booking.findAndCount(filter, {
       aggregate: { skip, limit },
       populate: [{ path: 'propertyId' }, { path: 'userId' }],

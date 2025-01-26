@@ -4,8 +4,11 @@ import mongoose, { HydratedDocument } from 'mongoose';
 
 import { Property } from '@on/app/property/model/property.model';
 import { User } from '@on/app/user/model/user/user.model';
+import { BOOKING_STATUS, PAYMENT_STATUS } from '@on/enums';
 
-import { IBooking } from '../types/booking.interface';
+import { IBooking, IGuest } from '../types/booking.interface';
+
+import { GuestSchema } from './guest.model';
 
 export type BookingDocument = HydratedDocument<Booking>;
 
@@ -20,12 +23,8 @@ export class Booking implements IBooking {
   userId: User;
 
   @ApiProperty()
-  @Prop({ required: false, type: Number })
-  adultNo: number;
-
-  @ApiProperty()
-  @Prop({ required: false, type: Number })
-  childNo: number;
+  @Prop({ required: true, type: GuestSchema })
+  guest: IGuest;
 
   @ApiProperty()
   @Prop({ required: true, type: Date })
@@ -36,8 +35,20 @@ export class Booking implements IBooking {
   checkOut: Date;
 
   @ApiProperty()
-  @Prop({ required: true, type: Boolean, default: false })
-  isPaid: boolean;
+  @Prop({ type: Number, required: false })
+  price: number;
+
+  @ApiProperty()
+  @Prop({ enum: PAYMENT_STATUS, default: PAYMENT_STATUS.UNPAID })
+  paymentStatus: PAYMENT_STATUS;
+
+  @ApiProperty()
+  @Prop({ enum: BOOKING_STATUS, default: BOOKING_STATUS.PENDING })
+  status: BOOKING_STATUS;
+
+  @ApiProperty()
+  @Prop({ type: String, required: false })
+  reference: string;
 
   @ApiProperty()
   @Prop({ required: true, type: String })

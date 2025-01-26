@@ -39,6 +39,19 @@ export enum PROPERTY_STATUS {
   BOOKED = 'booked',
 }
 
+export enum BOOKING_STATUS {
+  PENDING = 'available',
+  ACCEPTED = 'booked',
+  CANCELED = 'canceled',
+  COMPLETED = 'completed',
+}
+
+export enum PAYMENT_STATUS {
+  UNPAID = 'unpaid',
+  PAID = 'paid',
+  REFUNDED = 'refunded',
+}
+
 export enum TRANSACTION_STATUS {
   PENDING = 'pending',
   FAILED = 'failed',
